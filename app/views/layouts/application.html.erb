@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <title>BlackSuite</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              200: '#ddd6fe',
+              300: '#c4b5fd',
+              400: '#a78bfa',
+              500: '#8b5cf6',
+              600: '#7c3aed',
+              700: '#6d28d9',
+              800: '#5b21b6',
+              900: '#4c1d95',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html, body {
+      height: 100%;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .plotly-plot {
+      width: 100%;
+      min-height: 400px;
+    }
+    .plotly-plot .modebar {
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .plotly-plot:hover .modebar {
+      opacity: 1;
+    }
+    @media (max-width: 768px) {
+      .plotly-plot {
+        min-height: 300px;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex flex-col">
+  <% if user_signed_in? && !devise_controller? %>
+    <%= render 'layouts/navbar' %>
+  <% end %>
+
+  <%= render 'shared/flash' %>
+
+  <main class="flex-grow <%= user_signed_in? && !devise_controller? ? 'pt-16' : '' %>">
+    <%= yield %>
+  </main>
+
+  <% if user_signed_in? && !devise_controller? %>
+    <% cache ["footer", current_user.id] do %>
+      <footer class="bg-gradient-to-r from-primary-900 to-primary-800 text-white py-4 mt-auto">
+        <div class="container mx-auto px-4 text-center text-sm">
+          <p>BlackSuite <%= Time.now.year %></p>
+        </div>
+      </footer>
+    <% end %>
+  <% end %>
+</body>
+</html>

@@ -1,0 +1,55 @@
+module ExperimentsHelper
+  def experiment_status_color(status)
+    case status.to_s
+    when 'completed'
+      'success'
+    when 'running'
+      'warning'
+    when 'failed'
+      'danger'
+    when 'pending'
+      'secondary'
+    else
+      'info'
+    end
+  end
+
+  def experiment_status_icon(status)
+    case status.to_s
+    when 'completed'
+      'bi-check-circle'
+    when 'running'
+      'bi-play-circle'
+    when 'failed'
+      'bi-x-circle'
+    when 'pending'
+      'bi-clock'
+    else
+      'bi-question-circle'
+    end
+  end
+
+  def format_parameters(parameters)
+    return 'Нет параметров' if parameters.blank?
+
+    begin
+      json = JSON.parse(parameters)
+      content_tag(:pre, JSON.pretty_generate(json), class: 'bg-light p-2 rounded small')
+    rescue JSON::ParserError
+      content_tag(:code, parameters.truncate(100), class: 'text-muted')
+    end
+  end
+
+  def experiment_duration(experiment)
+    return unless experiment.started_at && experiment.completed_at
+
+    duration = experiment.completed_at - experiment.started_at
+    if duration > 3600
+      "#{(duration / 3600).round(1)} ч"
+    elsif duration > 60
+      "#{(duration / 60).round(0)} мин"
+    else
+      "#{duration.round(0)} сек"
+    end
+  end
+end

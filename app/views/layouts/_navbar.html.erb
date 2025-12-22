@@ -1,0 +1,58 @@
+<% cache_if user_signed_in?, ["navbar", current_user.id, current_user.updated_at.to_i] do %>
+  <nav class="fixed top-0 left-0 right-0 bg-white shadow-md z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <%= link_to root_path, class: "flex items-center group" do %>
+            <div class="h-8 w-8 text-primary-600 group-hover:scale-110 transition-transform">
+              <svg viewBox="0 0 48 48" fill="currentColor">
+                <polygon points="10.807 14.858 5.5 24.053 10.777 33.195 16.084 24 10.807 14.858" fill="#7c3aed" stroke="#6d28d9" stroke-width="0.5"></polygon>
+                <polygon points="16.084 24 10.777 33.195 21.331 33.195 26.639 24 16.084 24" fill="#8b5cf6" stroke="#6d28d9" stroke-width="0.5"></polygon>
+                <polygon points="10.807 14.858 16.084 24 26.639 24 21.361 14.858 10.807 14.858" fill="#a78bfa" stroke="#6d28d9" stroke-width="0.5"></polygon>
+                <polygon points="26.669 5.662 21.361 14.858 26.639 24 31.946 14.805 26.669 5.662" fill="#7c3aed" stroke="#6d28d9" stroke-width="0.5"></polygon>
+                <polygon points="31.946 14.805 26.639 24 37.193 24 42.5 14.805 31.946 14.805" fill="#8b5cf6" stroke="#6d28d9" stroke-width="0.5"></polygon>
+                <polygon points="26.669 5.662 31.946 14.805 42.5 14.805 37.223 5.662 26.669 5.662" fill="#a78bfa" stroke="#6d28d9" stroke-width="0.5"></polygon>
+                <polygon points="26.639 24 21.331 33.195 26.608 42.338 31.916 33.142 26.639 24" fill="#7c3aed" stroke="#6d28d9" stroke-width="0.5"></polygon>
+                <polygon points="31.916 33.142 26.608 42.338 37.163 42.338 42.47 33.142 31.916 33.142" fill="#8b5cf6" stroke="#6d28d9" stroke-width="0.5"></polygon>
+                <polygon points="26.639 24 31.916 33.142 42.47 33.142 37.193 24 26.639 24" fill="#a78bfa" stroke="#6d28d9" stroke-width="0.5"></polygon>
+              </svg>
+            </div>
+            <span class="ml-2 text-xl font-bold text-gray-800 group-hover:text-primary-600 transition-colors">BlackSuite</span>
+          <% end %>
+
+          <div class="hidden md:ml-6 md:flex md:space-x-8">
+            <%= link_to 'Все проекты', projects_path,
+                        class: "text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium #{current_page?(projects_path) ? 'text-primary-600 border-b-2 border-primary-600' : ''}" %>
+
+            <%= link_to 'Новый проект', new_project_path,
+                        class: "text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium #{current_page?(new_project_path) ? 'text-primary-600 border-b-2 border-primary-600' : ''}" %>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4">
+          <div class="hidden md:flex items-center space-x-3 bg-gray-100 px-4 py-2 rounded-lg">
+            <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow">
+              <span class="text-white font-medium text-sm">
+                <%= current_user.email[0].upcase %>
+              </span>
+            </div>
+
+            <div class="text-sm">
+              <p class="font-medium text-gray-700"><%= current_user.email %></p>
+            </div>
+          </div>
+
+          <%= button_to destroy_user_session_path,
+                        method: :delete,
+                        title: "Выйти",
+                        class: "flex items-center space-x-2 text-gray-700 hover:text-red-600 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors" do %>
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span class="hidden md:inline">Выйти</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </nav>
+<% end %>

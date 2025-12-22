@@ -1,0 +1,48 @@
+<div class="bg-white rounded-xl shadow p-6 mb-8">
+  <h3 class="font-medium text-gray-900 mb-6 text-lg">Информация о файле</h3>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div>
+      <h4 class="font-semibold text-gray-900 mb-4 pb-2 border-b border-primary-200">Основные данные</h4>
+      <div class="space-y-3">
+        <%= info_row 'Время создания:', format_timestamp(stats[:timestamp]) %>
+        <%= info_row 'Общее количество оценок:', stats[:total_evaluations] %>
+        <%= info_row 'Размерность:', stats[:dimension] %>
+        <%= info_row 'Параметры:', stats[:variables].join(', ') %>
+        <%= info_row 'COMSOL файл:', stats[:comsol_file], truncate: true %>
+      </div>
+    </div>
+
+    <div>
+      <h4 class="font-semibold text-gray-900 mb-4 pb-2 border-b border-primary-200">Статистика</h4>
+      <div class="space-y-3">
+        <%= info_row 'Лучшая точка:', format_best_point(stats[:best_point], stats[:variables]) %>
+        <%= info_row 'Лучший результат:', number_with_precision(stats[:fitness_range][:min], precision: 4) %>
+        <%= info_row 'Худший результат:', number_with_precision(stats[:fitness_range][:max], precision: 4) %>
+        <%= info_row 'Средний результат:', number_with_precision(stats[:fitness_range][:avg], precision: 4) %>
+        <%= info_row 'Медиана:', number_with_precision(calculate_median(stats[:points] || []), precision: 4) %>
+      </div>
+    </div>
+  </div>
+
+  <!-- параметры для графика -->
+  <div class="mt-8 pt-6 border-t border-gray-200">
+    <h4 class="font-semibold text-gray-900 mb-4">Границы поиска</h4>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <% if json_result.variable_ranges.present? %>
+        <% json_result.variable_ranges.each do |var_name, range| %>
+          <div class="bg-primary-50 rounded-lg p-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-medium text-gray-700"><%= var_name %>:</span>
+              <span class="text-sm font-mono text-gray-900">
+                [<%= sprintf('%.4f', range[:min]) %>, <%= sprintf('%.4f', range[:max]) %>]
+              </span>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <p class="text-sm text-gray-500">Границы поиска не указаны</p>
+      <% end %>
+    </div>
+  </div>
+</div>
