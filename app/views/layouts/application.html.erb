@@ -19,16 +19,16 @@
         extend: {
           colors: {
             primary: {
-              50: '#f5f3ff',
-              100: '#ede9fe',
-              200: '#ddd6fe',
-              300: '#c4b5fd',
-              400: '#a78bfa',
-              500: '#8b5cf6',
-              600: '#7c3aed',
-              700: '#6d28d9',
-              800: '#5b21b6',
-              900: '#4c1d95',
+              50: '#f8f7fc',
+              100: '#f0eef9',
+              200: '#e4e0f4',
+              300: '#d0c9eb',
+              400: '#b5aad9',
+              500: '#9a8bc7',
+              600: '#7f6bb0',
+              700: '#6b5699',
+              800: '#574680',
+              900: '#473a69',
             }
           }
         }
@@ -78,7 +78,7 @@
 
   <% if user_signed_in? && !devise_controller? %>
     <% cache ["footer", current_user.id] do %>
-      <footer class="bg-gradient-to-r from-primary-900 to-primary-800 text-white py-4 mt-auto">
+      <footer class="bg-gradient-to-r from-primary-700 to-primary-600 text-white py-4 mt-auto">
         <div class="container mx-auto px-4 text-center text-sm">
           <p>BlackSuite <%= Time.now.year %></p>
         </div>

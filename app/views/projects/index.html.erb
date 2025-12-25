@@ -1,7 +1,7 @@
 <div class="py-10">
   <header>
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <h1 class="text-3xl font-bold text-gray-900">Все проекты</h1>
+      <h1 class="text-2xl font-bold text-gray-800">Все проекты</h1>
     </div>
   </header>
 
@@ -16,14 +16,14 @@
       <% else %>
         <div class="min-h-[60vh] flex flex-col items-center justify-center py-12">
           <div class="text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <svg class="mx-auto h-16 w-16 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
             </svg>
-            <h3 class="mt-2 text-sm font-semibold text-gray-900">Нет проектов</h3>
-            <p class="mt-1 text-sm text-gray-500">Создайте свой первый проект для начала работы</p>
+            <h3 class="mt-4 text-lg font-medium text-gray-600">Нет проектов</h3>
+            <p class="mt-1 text-sm text-gray-400">Создайте свой первый проект для начала работы</p>
             <div class="mt-6">
               <%= link_to 'Создать проект', new_project_path,
-                          class: "inline-flex items-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-700 transition" %>
+                          class: "inline-flex items-center rounded-lg bg-primary-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-600 transition" %>
             </div>
           </div>
         </div>

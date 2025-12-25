@@ -1,9 +1,9 @@
-<div class="bg-white rounded-xl shadow p-6 mb-8">
-  <h3 class="font-medium text-gray-900 mb-6 text-lg">Информация о файле</h3>
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+  <h3 class="font-medium text-gray-700 mb-6 text-base">Информация о файле</h3>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <div>
-      <h4 class="font-semibold text-gray-900 mb-4 pb-2 border-b border-primary-200">Основные данные</h4>
+      <h4 class="font-medium text-gray-600 mb-4 pb-2 border-b border-gray-100 text-sm">Основные данные</h4>
       <div class="space-y-3">
         <%= info_row 'Время создания:', format_timestamp(stats[:timestamp]) %>
         <%= info_row 'Общее количество оценок:', stats[:total_evaluations] %>
@@ -14,7 +14,7 @@
     </div>
 
     <div>
-      <h4 class="font-semibold text-gray-900 mb-4 pb-2 border-b border-primary-200">Статистика</h4>
+      <h4 class="font-medium text-gray-600 mb-4 pb-2 border-b border-gray-100 text-sm">Статистика</h4>
       <div class="space-y-3">
         <%= info_row 'Лучшая точка:', format_best_point(stats[:best_point], stats[:variables]) %>
         <%= info_row 'Лучший результат:', number_with_precision(stats[:fitness_range][:min], precision: 4) %>
@@ -26,22 +26,22 @@
   </div>
 
   <!-- параметры для графика -->
-  <div class="mt-8 pt-6 border-t border-gray-200">
-    <h4 class="font-semibold text-gray-900 mb-4">Границы поиска</h4>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <div class="mt-6 pt-6 border-t border-gray-100">
+    <h4 class="font-medium text-gray-600 mb-4 text-sm">Границы поиска</h4>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <% if json_result.variable_ranges.present? %>
         <% json_result.variable_ranges.each do |var_name, range| %>
-          <div class="bg-primary-50 rounded-lg p-3">
+          <div class="bg-gray-50 rounded-lg p-3">
             <div class="flex justify-between items-center">
-              <span class="text-sm font-medium text-gray-700"><%= var_name %>:</span>
-              <span class="text-sm font-mono text-gray-900">
+              <span class="text-sm font-medium text-gray-600"><%= var_name %>:</span>
+              <span class="text-sm font-mono text-gray-700">
                 [<%= sprintf('%.4f', range[:min]) %>, <%= sprintf('%.4f', range[:max]) %>]
               </span>
             </div>
           </div>
         <% end %>
       <% else %>
-        <p class="text-sm text-gray-500">Границы поиска не указаны</p>
+        <p class="text-sm text-gray-400">Границы поиска не указаны</p>
       <% end %>
     </div>
   </div>

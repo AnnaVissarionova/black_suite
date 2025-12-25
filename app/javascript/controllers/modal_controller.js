@@ -1,4 +1,3 @@
-// app/javascript/controllers/modal_controller.js
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
@@ -27,7 +26,6 @@ export default class extends Controller {
         }
     }
 
-    // Закрытие по клику вне модального окна
     closeBackground(event) {
         if (event.target === this.modalTarget) {
             this.close()

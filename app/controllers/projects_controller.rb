@@ -3,7 +3,6 @@ class ProjectsController < ApplicationController
 
   before_action :set_project, only: %i[show edit update destroy update_sharing disable_sharing regenerate_token sharing show_experiment]
 
-  # GET /projects
   def index
     redirect_to new_user_session_path, alert: 'Необходимо войти в систему' and return unless current_user
 
@@ -12,7 +11,6 @@ class ProjectsController < ApplicationController
                             .order(created_at: :desc)
   end
 
-  # GET /projects/:id
   def show
     authorize @project
 
@@ -21,8 +19,6 @@ class ProjectsController < ApplicationController
                            .order(created_at: :desc)
   end
 
-  # GET /projects/:id/experiment/:experiment_id
-  # Новый action для показа эксперимента через контроллер проекта
   def show_experiment
     authorize @project
 
@@ -32,7 +28,6 @@ class ProjectsController < ApplicationController
 
     authorize @experiment, :show?
 
-    # Загружаем последний результат одним запросом (уже загружен через includes)
     @latest_json = @experiment.json_results.max_by(&:created_at)
     @json_results_count = @experiment.json_results_count
 
@@ -40,9 +35,19 @@ class ProjectsController < ApplicationController
       @stats = extract_stats(@latest_json, param_x, param_y)
       @plot_3d_data = @stats[:plot_3d_data]
       @fitness_history_data = @stats[:fitness_history_data]
+
+      @plot_3d_data ||= { points: [], selected_x_name: 'X', selected_y_name: 'Y' }
+      @fitness_history_data ||= { history: [], iterations: [] }
+    else
+      @plot_3d_data = { points: [], selected_x_name: 'X', selected_y_name: 'Y' }
+      @fitness_history_data = { history: [], iterations: [] }
     end
 
-    render 'experiments/show'
+    if request.xhr? || params[:partial] == 'true'
+      render partial: 'experiments/experiment_partial', layout: false
+    else
+      render 'experiments/show'
+    end
   end
 
   def new
@@ -98,9 +103,11 @@ class ProjectsController < ApplicationController
             share_url: shared_project_url(@project.share_token)
           }
         else
+          token = generate_unique_token
+
           @project.update!(
             share_mode: 'view',
-            share_token: SecureRandom.urlsafe_base64(16)
+            share_token: token
           )
 
           render json: {
@@ -150,6 +157,17 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def sharing
+    authorize @project, :update?
+
+    render json: {
+      shared: @project.shared?,
+      share_mode: @project.share_mode,
+      share_token: @project.share_token,
+      share_url: @project.shared? ? shared_project_url(@project.share_token) : nil
+    }
+  end
+
   def regenerate_token
     authorize @project, :update?
 
@@ -182,16 +200,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def sharing
-    authorize @project, :update?
-
-    render json: {
-      shared: @project.shared?,
-      share_mode: @project.share_mode,
-      share_token: @project.share_token,
-      share_url: @project.shared? ? shared_project_url(@project.share_token) : nil
-    }
-  end
 
   def disable_sharing
     authorize @project, :update?
@@ -212,8 +220,14 @@ class ProjectsController < ApplicationController
     end
   end
 
-
   private
+
+  def generate_unique_token
+    loop do
+      token = SecureRandom.urlsafe_base64(16)
+      break token unless Project.exists?(share_token: token)
+    end
+  end
 
   def set_project
     if params[:share_token].present?
@@ -222,7 +236,6 @@ class ProjectsController < ApplicationController
       ).find_by!(share_token: params[:share_token])
 
     elsif current_user.present?
-      # Используем includes только когда нужны эксперименты с результатами
       if action_name == 'show_experiment'
         @project = current_user.projects.find(params[:id])
       else

@@ -21,6 +21,7 @@ Rails.application.routes.draw do
         post :regenerate_token
         delete :disable_sharing
         get :sharing, defaults: { format: :json }
+        get 'update_plot_data'
       end
     end
   end

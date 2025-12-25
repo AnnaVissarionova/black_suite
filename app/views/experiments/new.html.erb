@@ -1,25 +1,20 @@
 <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
   <div class="max-w-4xl mx-auto">
-    <!-- Навигация -->
     <nav class="mb-8 text-sm">
-      <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-800' %> ›
-      <%= link_to @project.name, project_path(@project), class: 'text-primary-600 hover:text-primary-800' %> ›
-      <%= link_to 'Эксперименты', project_experiments_path(@project), class: 'text-primary-600 hover:text-primary-800' %> ›
+      <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-700' %> ›
+      <%= link_to @project.name, project_path(@project), class: 'text-primary-600 hover:text-primary-700' %> ›
       <span class="text-gray-600 font-medium">Новый эксперимент</span>
     </nav>
 
-    <!-- Заголовок -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">Новый эксперимент</h1>
-      <p class="mt-2 text-gray-600">Создайте эксперимент для проекта «<%= @project.name %>»</p>
+      <h1 class="text-2xl font-bold text-gray-800">Новый эксперимент</h1>
+      <p class="mt-2 text-gray-500 text-sm">Создайте эксперимент для проекта «<%= @project.name %>»</p>
     </div>
 
-    <!-- Форма -->
-    <div class="bg-white shadow rounded-lg p-8">
+    <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-8">
       <%= form_with model: [@project, @experiment], multipart: true, class: 'space-y-8', data: { controller: 'file-upload' } do |f| %>
-        <!-- Основная информация -->
         <div>
-          <h3 class="text-lg font-medium text-gray-900 border-b border-primary-200 pb-2 mb-6">Основная информация</h3>
+          <h3 class="text-base font-medium text-gray-700 border-b border-gray-100 pb-2 mb-6">Основная информация</h3>
 
           <div class="space-y-6">
             <div>
@@ -27,7 +22,7 @@
               <%= f.text_field :name,
                                required: true,
                                placeholder: 'Введите название эксперимента',
-                               class: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition' %>
+                               class: 'w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition' %>
             </div>
 
             <div>
@@ -35,19 +30,17 @@
               <%= f.text_area :description,
                               rows: 3,
                               placeholder: 'Опишите цели и задачи эксперимента...',
-                              class: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition resize-none' %>
+                              class: 'w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition resize-none' %>
             </div>
           </div>
         </div>
 
-        <!-- Загрузка JSON -->
         <div>
-          <h3 class="text-lg font-medium text-gray-900 border-b border-primary-200 pb-2 mb-6">Данные результатов</h3>
-          <p class="text-sm text-gray-600 mb-6">Загрузите JSON файл с результатами оптимизации COMSOL</p>
+          <h3 class="text-base font-medium text-gray-700 border-b border-gray-100 pb-2 mb-6">Данные результатов</h3>
+          <p class="text-sm text-gray-500 mb-6">Загрузите JSON файл с результатами оптимизации COMSOL</p>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Зона загрузки -->
-            <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-primary-400 transition h-full min-h-[180px] cursor-pointer"
+            <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 border-dashed rounded-lg hover:border-primary-300 transition h-full min-h-[180px] cursor-pointer"
                  id="file-dropzone"
                  data-file-upload-target="dropzone">
               <div class="space-y-1 text-center self-center">
@@ -63,14 +56,12 @@
               </div>
             </div>
 
-            <!-- Скрытое поле для файла -->
             <%= f.file_field :json_file,
                              accept: '.json',
                              class: 'hidden',
                              id: 'json_file',
                              data: { file_upload_target: 'input' } %>
 
-            <!-- Предпросмотр -->
             <div id="file-preview" class="hidden flex flex-col space-y-4" data-file-upload-target="preview">
               <div class="rounded-lg bg-primary-50 p-4 border border-primary-200 flex-1">
                 <div class="flex">
@@ -103,7 +94,6 @@
             </div>
           </div>
 
-          <!-- Пример структуры -->
           <div class="mt-6 rounded-lg bg-primary-50 border border-primary-200 p-4">
             <h4 class="text-sm font-medium text-primary-800 mb-2">Пример структуры JSON:</h4>
             <pre class="bg-white p-3 rounded border border-primary-200 overflow-x-auto text-xs">{
@@ -122,19 +112,17 @@
           </div>
         </div>
 
-        <!-- Кнопки -->
-        <div class="flex items-center justify-end space-x-4 pt-6 border-t">
-          <%= link_to 'Отмена', project_experiments_path(@project),
-                      class: 'px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition' %>
+        <div class="flex items-center justify-end space-x-4 pt-6 border-t border-gray-100">
+          <%= link_to 'Отмена', project_path(@project),
+                      class: 'px-4 py-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition' %>
           <%= f.submit 'Создать эксперимент',
-                       class: 'px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-medium cursor-pointer' %>
+                       class: 'px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition font-medium cursor-pointer' %>
         </div>
       <% end %>
     </div>
   </div>
 </div>
 
-<!-- Модальное окно для предпросмотра -->
 <div id="json-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto z-50" data-file-upload-target="modal">
   <div class="flex items-center justify-center min-h-screen p-4">
     <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
@@ -172,7 +160,6 @@
 
         if (!dropzone || !fileInput) return;
 
-        // Предотвращаем стандартное поведение браузера
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             dropzone.addEventListener(eventName, function(e) {
                 e.preventDefault();
@@ -180,7 +167,6 @@
             });
         });
 
-        // Подсветка при перетаскивании
         ['dragenter', 'dragover'].forEach(eventName => {
             dropzone.addEventListener(eventName, function() {
                 dropzone.classList.add('border-primary-400', 'bg-primary-50');
@@ -193,7 +179,6 @@
             });
         });
 
-        // Обработка drop
         dropzone.addEventListener('drop', function(e) {
             const files = e.dataTransfer.files;
             if (files.length > 0) {
@@ -205,12 +190,10 @@
             }
         });
 
-        // Клик по зоне загрузки
         dropzone.addEventListener('click', function() {
             fileInput.click();
         });
 
-        // Изменение файла через input
         fileInput.addEventListener('change', function() {
             if (this.files.length > 0) {
                 handleFileSelect(this.files[0]);
@@ -220,27 +203,23 @@
         function handleFileSelect(file) {
             if (!file) return;
 
-            // Проверка типа файла
             if (!file.name.toLowerCase().endsWith('.json')) {
                 alert('Пожалуйста, загрузите файл в формате JSON');
                 fileInput.value = '';
                 return;
             }
 
-            // Проверка размера
             if (file.size > 10 * 1024 * 1024) {
                 alert('Файл слишком большой. Максимальный размер: 10MB');
                 fileInput.value = '';
                 return;
             }
 
-            // Показываем превью
             fileNameEl.textContent = file.name;
             fileSizeEl.textContent = '(' + (file.size / 1024).toFixed(2) + ' KB)';
             filePreview.classList.remove('hidden');
         }
 
-        // Очистка файла
         if (clearFileBtn) {
             clearFileBtn.addEventListener('click', function() {
                 fileInput.value = '';
@@ -248,7 +227,6 @@
             });
         }
 
-        // Предпросмотр JSON
         if (previewJsonBtn) {
             previewJsonBtn.addEventListener('click', function() {
                 if (!fileInput.files || fileInput.files.length === 0) {
@@ -271,7 +249,6 @@
             });
         }
 
-        // Закрытие модального окна
         function closeModal() {
             jsonModal.classList.add('hidden');
             document.body.style.overflow = 'auto';
@@ -283,7 +260,6 @@
             }
         });
 
-        // Закрытие по кнопкам внутри модалки
         jsonModal.querySelectorAll('button').forEach(function(btn) {
             btn.addEventListener('click', closeModal);
         });

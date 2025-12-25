@@ -12,9 +12,7 @@ class ExperimentsController < ApplicationController
                            .then { |scope| apply_sorting(scope) }
   end
 
-  # Редирект на оптимизированный маршрут через ProjectsController
   def show
-    # Для shared доступа используем старую логику
     if params[:share_token].present?
       authorize @experiment
       @latest_json = @experiment.json_results.order(created_at: :desc).first
@@ -28,7 +26,6 @@ class ExperimentsController < ApplicationController
       return
     end
 
-    # Для обычного доступа редиректим на оптимизированный путь
     redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id, param_x: params[:param_x], param_y: params[:param_y])
   end
 
@@ -44,7 +41,15 @@ class ExperimentsController < ApplicationController
   def update
     authorize @experiment
     if @experiment.update(experiment_params)
-      redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id), notice: 'Эксперимент успешно обновлён'
+      if params[:json_file].present?
+        begin
+          json_data = JSON.parse(params[:json_file].read)
+          JsonResult.create!(experiment: @experiment, metadata: json_data)
+        rescue JSON::ParserError => e
+          flash[:alert] = "Ошибка при обработке JSON файла: #{e.message}"
+        end
+      end
+      redirect_to project_path(@project), notice: 'Эксперимент успешно обновлён'
     else
       render :edit, status: :unprocessable_entity
     end
@@ -71,7 +76,20 @@ class ExperimentsController < ApplicationController
 
   def download_json
     authorize @experiment
-    render project_experiment_path(@project), alert: 'Пока недоступно ;)'
+    
+    @latest_json = @experiment.json_results.order(created_at: :desc).first
+    
+    if @latest_json && @latest_json.metadata.present?
+      json_content = @latest_json.metadata.is_a?(String) ? @latest_json.metadata : @latest_json.metadata.to_json
+      
+      send_data json_content,
+                filename: "#{@experiment.name.parameterize}_results.json",
+                type: 'application/json',
+                disposition: 'attachment'
+    else
+      redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id), 
+                  alert: 'JSON файл не найден'
+    end
   end
 
   def update_sharing
@@ -98,6 +116,24 @@ class ExperimentsController < ApplicationController
       shared: @experiment.shared?,
       share_token: @experiment.share_token,
       share_url: @experiment.shared? ? shared_experiment_url(@experiment.share_token) : nil
+    }
+  end
+
+  def update_plot_data
+    @experiment = @project.experiments.includes(:json_results).find(params[:id])
+    authorize @experiment, :show?
+
+    @latest_json = @experiment.json_results.max_by(&:created_at)
+
+    if @latest_json&.valid_json?
+      @stats = extract_stats(@latest_json, params[:param_x]&.to_i || 0, params[:param_y]&.to_i || 1)
+      plot_3d_data = @stats[:plot_3d_data]
+      fitness_history_data = @stats[:fitness_history_data]
+    end
+
+    render json: {
+      plot_3d: plot_3d_data || {},
+      fitness_history: fitness_history_data || {}
     }
   end
 
@@ -167,11 +203,11 @@ class ExperimentsController < ApplicationController
   end
 
   def json_file_present?
-    params[:json_file].present?
+    params[:experiment][:json_file].present?
   end
 
   def create_json_result
-    json_data = JSON.parse(params[:json_file].read) rescue {}
+    json_data = JSON.parse(params[:experiment][:json_file].read) rescue {}
     JsonResult.create!(experiment: @experiment, metadata: json_data)
   end
 end

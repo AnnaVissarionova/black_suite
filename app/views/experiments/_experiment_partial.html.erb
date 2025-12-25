@@ -1,0 +1,109 @@
+<div class="p-6" id="experiment-partial-<%= @experiment.id %>">
+  <div class="mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+      <div class="flex-1">
+        <h2 class="text-xl font-bold text-gray-800"><%= @experiment.name %></h2>
+        <% if @experiment.description.present? %>
+          <p class="text-gray-500 mt-1 text-sm"><%= @experiment.description %></p>
+        <% end %>
+      </div>
+
+      <% if policy(@experiment).update? %>
+        <div class="flex flex-wrap gap-2">
+          <% if @json_results_count && @json_results_count > 0 %>
+            <%= link_to download_json_project_experiment_path(@project, @experiment),
+                        class: "inline-flex items-center px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-300 transition-all" do %>
+              <svg class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Скачать JSON
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @json_results_count.nil? || @json_results_count == 0 %>
+    <div class="bg-gray-50 rounded-lg p-8 text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      <h3 class="mt-3 text-sm font-medium text-gray-600">Пока нет результатов</h3>
+      <p class="mt-1 text-xs text-gray-400">Загрузите JSON файл для визуализации данных</p>
+    </div>
+  <% elsif @latest_json&.valid_json? && @stats.present? && @plot_3d_data.present? %>
+    <%= render 'experiments/stats_panel', stats: @stats, json_result: @latest_json %>
+
+    <% if @stats[:dimension] && @stats[:dimension] > 2 %>
+      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
+        <h3 class="font-medium text-gray-700 mb-3 text-sm">Выбор параметров для визуализации</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Параметр X:</label>
+            <select id="param-x-select"
+                    onchange="reloadExperimentWithParams()"
+                    class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary-400 focus:ring-primary-400 text-sm">
+              <% @stats[:variables].each_with_index do |var, index| %>
+                <option value="<%= index %>" <%= 'selected' if index == (params[:param_x]&.to_i || 0) %>><%= var %></option>
+              <% end %>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Параметр Y:</label>
+            <select id="param-y-select"
+                    onchange="reloadExperimentWithParams()"
+                    class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary-400 focus:ring-primary-400 text-sm">
+              <% @stats[:variables].each_with_index do |var, index| %>
+                <option value="<%= index %>" <%= 'selected' if index == (params[:param_y]&.to_i || 1) %>><%= var %></option>
+              <% end %>
+            </select>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+
+    <div data-controller="lazy-plot"
+         data-lazy-plot-plot3d-value="<%= @plot_3d_data.to_json %>"
+         data-lazy-plot-fitness-history-value="<%= @fitness_history_data.to_json %>"
+         data-lazy-plot-experiment-id-value="<%= @experiment.id %>"
+         data-lazy-plot-project-id-value="<%= @project.id %>">
+
+      <!-- 3D График -->
+      <%= render 'experiments/plot_3d' %>
+
+      <!-- График истории fitness -->
+      <%= render 'experiments/fitness_history_plot' %>
+    </div>
+  <% else %>
+    <div class="bg-gray-50 rounded-lg p-8 text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <h3 class="mt-3 text-sm font-medium text-gray-600">Нет данных для отображения</h3>
+      <p class="mt-1 text-xs text-gray-400">Загрузите JSON файл с результатами оптимизации</p>
+    </div>
+  <% end %>
+</div>
+
+<style>
+    #optimization-plot, #fitness-history-plot {
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+    }
+</style>
+
+<script>
+    function resetCamera() {
+        if (typeof Plotly !== 'undefined') {
+            Plotly.relayout('optimization-plot', { 'scene.camera.eye': { x: 1.5, y: 1.5, z: 1.5 } });
+        }
+    }
+
+    function downloadPlot() {
+        if (typeof Plotly !== 'undefined') {
+            Plotly.downloadImage(document.getElementById('optimization-plot'), { format: 'png', filename: 'optimization_plot' });
+        }
+    }
+</script>
