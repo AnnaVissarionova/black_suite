@@ -16,5 +16,34 @@ test:
   database: app_test
 
 production:
-  <<: *default
-  database: app_production
+  primary:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB", "black_suite_production") %>
+    username: <%= ENV.fetch("POSTGRES_USER", "black_suite") %>
+    password: <%= ENV.fetch("POSTGRES_PASSWORD") %>
+    host: <%= ENV.fetch("POSTGRES_HOST", "black_suite-db") %>
+    port: <%= ENV.fetch("POSTGRES_PORT", "5432") %>
+  cache:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB", "black_suite_production") %>
+    username: <%= ENV.fetch("POSTGRES_USER", "black_suite") %>
+    password: <%= ENV.fetch("POSTGRES_PASSWORD") %>
+    host: <%= ENV.fetch("POSTGRES_HOST", "black_suite-db") %>
+    port: <%= ENV.fetch("POSTGRES_PORT", "5432") %>
+    migrations_paths: db/cache_migrate
+  queue:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB", "black_suite_production") %>
+    username: <%= ENV.fetch("POSTGRES_USER", "black_suite") %>
+    password: <%= ENV.fetch("POSTGRES_PASSWORD") %>
+    host: <%= ENV.fetch("POSTGRES_HOST", "black_suite-db") %>
+    port: <%= ENV.fetch("POSTGRES_PORT", "5432") %>
+    migrations_paths: db/queue_migrate
+  cable:
+    <<: *default
+    database: <%= ENV.fetch("POSTGRES_DB", "black_suite_production") %>
+    username: <%= ENV.fetch("POSTGRES_USER", "black_suite") %>
+    password: <%= ENV.fetch("POSTGRES_PASSWORD") %>
+    host: <%= ENV.fetch("POSTGRES_HOST", "black_suite-db") %>
+    port: <%= ENV.fetch("POSTGRES_PORT", "5432") %>
+    migrations_paths: db/cable_migrate

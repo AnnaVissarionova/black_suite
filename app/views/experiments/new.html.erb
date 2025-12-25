@@ -2,9 +2,9 @@
   <div class="max-w-4xl mx-auto">
     <!-- Навигация -->
     <nav class="mb-8 text-sm">
-      <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-800' %> › 
-      <%= link_to @project.name, project_path(@project), class: 'text-primary-600 hover:text-primary-800' %> › 
-      <%= link_to 'Эксперименты', project_experiments_path(@project), class: 'text-primary-600 hover:text-primary-800' %> › 
+      <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-800' %> ›
+      <%= link_to @project.name, project_path(@project), class: 'text-primary-600 hover:text-primary-800' %> ›
+      <%= link_to 'Эксперименты', project_experiments_path(@project), class: 'text-primary-600 hover:text-primary-800' %> ›
       <span class="text-gray-600 font-medium">Новый эксперимент</span>
     </nav>
 
@@ -16,26 +16,26 @@
 
     <!-- Форма -->
     <div class="bg-white shadow rounded-lg p-8">
-      <%= form_with model: [@project, @experiment], multipart: true, class: 'space-y-8' do |f| %>
+      <%= form_with model: [@project, @experiment], multipart: true, class: 'space-y-8', data: { controller: 'file-upload' } do |f| %>
         <!-- Основная информация -->
         <div>
           <h3 class="text-lg font-medium text-gray-900 border-b border-primary-200 pb-2 mb-6">Основная информация</h3>
-          
+
           <div class="space-y-6">
             <div>
               <%= f.label :name, 'Название эксперимента', class: 'block text-sm font-medium text-gray-700 mb-2' %>
-              <%= f.text_field :name, 
-                              required: true,
-                              placeholder: 'Введите название эксперимента',
-                              class: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition' %>
+              <%= f.text_field :name,
+                               required: true,
+                               placeholder: 'Введите название эксперимента',
+                               class: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition' %>
             </div>
 
             <div>
               <%= f.label :description, 'Описание', class: 'block text-sm font-medium text-gray-700 mb-2' %>
               <%= f.text_area :description,
-                             rows: 3,
-                             placeholder: 'Опишите цели и задачи эксперимента...',
-                             class: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition resize-none' %>
+                              rows: 3,
+                              placeholder: 'Опишите цели и задачи эксперимента...',
+                              class: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition resize-none' %>
             </div>
           </div>
         </div>
@@ -47,29 +47,31 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Зона загрузки -->
-            <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-primary-400 transition h-full min-h-[180px]" 
-                 id="file-dropzone">
+            <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-primary-400 transition h-full min-h-[180px] cursor-pointer"
+                 id="file-dropzone"
+                 data-file-upload-target="dropzone">
               <div class="space-y-1 text-center self-center">
                 <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" 
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <div class="flex text-sm text-gray-600 justify-center">
-                  <label for="json_file" class="relative cursor-pointer rounded-md bg-white font-medium text-primary-600 hover:text-primary-500">
-                    <span>Загрузите файл</span>
-                    <%= file_field_tag :json_file, 
-                                       accept: '.json',
-                                       class: 'sr-only',
-                                       id: 'json_file' %>
-                  </label>
+                  <span class="font-medium text-primary-600">Загрузите файл</span>
                   <p class="pl-1">или перетащите сюда</p>
                 </div>
                 <p class="text-xs text-gray-500">JSON файлы до 10MB</p>
               </div>
             </div>
 
+            <!-- Скрытое поле для файла -->
+            <%= f.file_field :json_file,
+                             accept: '.json',
+                             class: 'hidden',
+                             id: 'json_file',
+                             data: { file_upload_target: 'input' } %>
+
             <!-- Предпросмотр -->
-            <div id="file-preview" class="hidden flex flex-col space-y-4">
+            <div id="file-preview" class="hidden flex flex-col space-y-4" data-file-upload-target="preview">
               <div class="rounded-lg bg-primary-50 p-4 border border-primary-200 flex-1">
                 <div class="flex">
                   <div class="flex-shrink-0">
@@ -80,10 +82,10 @@
                   <div class="ml-3 flex-1">
                     <div class="flex justify-between items-start">
                       <div class="flex-1">
-                        <p id="file-name" class="text-sm font-medium text-primary-800 truncate"></p>
-                        <p id="file-size" class="text-sm text-primary-700 mt-1"></p>
+                        <p id="file-name" class="text-sm font-medium text-primary-800 truncate" data-file-upload-target="fileName"></p>
+                        <p id="file-size" class="text-sm text-primary-700 mt-1" data-file-upload-target="fileSize"></p>
                       </div>
-                      <button type="button" id="clear-file" class="text-primary-700 hover:text-primary-600 ml-2">
+                      <button type="button" id="clear-file" class="text-primary-700 hover:text-primary-600 ml-2" data-action="click->file-upload#clear">
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                           <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
                         </svg>
@@ -93,8 +95,9 @@
                 </div>
               </div>
 
-              <button type="button" id="preview-json" 
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition">
+              <button type="button" id="preview-json"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition"
+                      data-action="click->file-upload#showPreview">
                 Предпросмотр JSON
               </button>
             </div>
@@ -121,10 +124,10 @@
 
         <!-- Кнопки -->
         <div class="flex items-center justify-end space-x-4 pt-6 border-t">
-          <%= link_to 'Отмена', project_experiments_path(@project), 
+          <%= link_to 'Отмена', project_experiments_path(@project),
                       class: 'px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition' %>
-          <%= f.submit 'Создать эксперимент', 
-                      class: 'px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-medium' %>
+          <%= f.submit 'Создать эксперимент',
+                       class: 'px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-medium cursor-pointer' %>
         </div>
       <% end %>
     </div>
@@ -132,22 +135,22 @@
 </div>
 
 <!-- Модальное окно для предпросмотра -->
-<div id="json-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto z-50">
+<div id="json-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto z-50" data-file-upload-target="modal">
   <div class="flex items-center justify-center min-h-screen p-4">
     <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
       <div class="flex justify-between items-center p-6 border-b">
         <h3 class="text-lg font-medium text-gray-900">Предпросмотр JSON</h3>
-        <button type="button" id="close-modal" class="text-gray-400 hover:text-gray-500">
+        <button type="button" class="text-gray-400 hover:text-gray-500" data-action="click->file-upload#closeModal">
           <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
       <div class="p-6 overflow-y-auto max-h-[70vh]">
-        <pre id="json-content" class="bg-gray-50 p-4 rounded text-xs overflow-x-auto"></pre>
+        <pre id="json-content" class="bg-gray-50 p-4 rounded text-xs overflow-x-auto" data-file-upload-target="jsonContent"></pre>
       </div>
       <div class="flex justify-end p-6 border-t">
-        <button type="button" id="close-modal-2" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+        <button type="button" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition" data-action="click->file-upload#closeModal">
           Закрыть
         </button>
       </div>
@@ -156,106 +159,133 @@
 </div>
 
 <script>
-  document.addEventListener('turbo:load', function() {
-    const dropzone = document.getElementById('file-dropzone');
-    const fileInput = document.getElementById('json_file');
-    const filePreview = document.getElementById('file-preview');
-    const fileName = document.getElementById('file-name');
-    const fileSize = document.getElementById('file-size');
-    const clearFileBtn = document.getElementById('clear-file');
-    const previewJsonBtn = document.getElementById('preview-json');
-    const jsonModal = document.getElementById('json-modal');
-    const jsonContent = document.getElementById('json-content');
-    const closeModalBtn = document.getElementById('close-modal');
-    const closeModalBtn2 = document.getElementById('close-modal-2');
-    let currentFile = null;
+    (function() {
+        const dropzone = document.getElementById('file-dropzone');
+        const fileInput = document.getElementById('json_file');
+        const filePreview = document.getElementById('file-preview');
+        const fileNameEl = document.getElementById('file-name');
+        const fileSizeEl = document.getElementById('file-size');
+        const clearFileBtn = document.getElementById('clear-file');
+        const previewJsonBtn = document.getElementById('preview-json');
+        const jsonModal = document.getElementById('json-modal');
+        const jsonContent = document.getElementById('json-content');
 
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropzone.addEventListener(eventName, e => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-    });
+        if (!dropzone || !fileInput) return;
 
-    ['dragenter', 'dragover'].forEach(eventName => {
-      dropzone.addEventListener(eventName, () => dropzone.classList.add('border-primary-400', 'bg-primary-50'));
-    });
+        // Предотвращаем стандартное поведение браузера
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
 
-    ['dragleave', 'drop'].forEach(eventName => {
-      dropzone.addEventListener(eventName, () => dropzone.classList.remove('border-primary-400', 'bg-primary-50'));
-    });
+        // Подсветка при перетаскивании
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, function() {
+                dropzone.classList.add('border-primary-400', 'bg-primary-50');
+            });
+        });
 
-    dropzone.addEventListener('drop', e => {
-      if (e.dataTransfer.files.length) {
-        fileInput.files = e.dataTransfer.files;
-        handleFileSelect(e.dataTransfer.files[0]);
-      }
-    });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, function() {
+                dropzone.classList.remove('border-primary-400', 'bg-primary-50');
+            });
+        });
 
-    dropzone.addEventListener('click', e => {
-      if (e.target !== fileInput) fileInput.click();
-    });
+        // Обработка drop
+        dropzone.addEventListener('drop', function(e) {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                // Создаем новый DataTransfer для установки файлов в input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(files[0]);
+                fileInput.files = dataTransfer.files;
+                handleFileSelect(files[0]);
+            }
+        });
 
-    fileInput.addEventListener('change', function() {
-      if (this.files.length) handleFileSelect(this.files[0]);
-    });
+        // Клик по зоне загрузки
+        dropzone.addEventListener('click', function() {
+            fileInput.click();
+        });
 
-    function handleFileSelect(file) {
-      if (!file) return;
+        // Изменение файла через input
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                handleFileSelect(this.files[0]);
+            }
+        });
 
-      if (!file.type.includes('json') && !file.name.endsWith('.json')) {
-        alert('Пожалуйста, загрузите файл в формате JSON');
-        fileInput.value = '';
-        return;
-      }
+        function handleFileSelect(file) {
+            if (!file) return;
 
-      if (file.size > 10 * 1024 * 1024) {
-        alert('Файл слишком большой. Максимальный размер: 10MB');
-        fileInput.value = '';
-        return;
-      }
+            // Проверка типа файла
+            if (!file.name.toLowerCase().endsWith('.json')) {
+                alert('Пожалуйста, загрузите файл в формате JSON');
+                fileInput.value = '';
+                return;
+            }
 
-      currentFile = file;
-      fileName.textContent = file.name;
-      fileSize.textContent = `(${(file.size / 1024).toFixed(2)} KB)`;
-      filePreview.classList.remove('hidden');
-    }
+            // Проверка размера
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Файл слишком большой. Максимальный размер: 10MB');
+                fileInput.value = '';
+                return;
+            }
 
-    clearFileBtn?.addEventListener('click', () => {
-      fileInput.value = '';
-      filePreview.classList.add('hidden');
-      currentFile = null;
-    });
-
-    previewJsonBtn?.addEventListener('click', () => {
-      if (!currentFile) {
-        alert('Сначала загрузите файл');
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = e => {
-        try {
-          const json = JSON.parse(e.target.result);
-          jsonContent.textContent = JSON.stringify(json, null, 2);
-          jsonModal.classList.remove('hidden');
-          document.body.style.overflow = 'hidden';
-        } catch (error) {
-          alert('Ошибка чтения JSON файла: ' + error.message);
+            // Показываем превью
+            fileNameEl.textContent = file.name;
+            fileSizeEl.textContent = '(' + (file.size / 1024).toFixed(2) + ' KB)';
+            filePreview.classList.remove('hidden');
         }
-      };
-      reader.readAsText(currentFile);
-    });
 
-    const closeModal = () => {
-      jsonModal.classList.add('hidden');
-      document.body.style.overflow = 'auto';
-    };
+        // Очистка файла
+        if (clearFileBtn) {
+            clearFileBtn.addEventListener('click', function() {
+                fileInput.value = '';
+                filePreview.classList.add('hidden');
+            });
+        }
 
-    closeModalBtn?.addEventListener('click', closeModal);
-    closeModalBtn2?.addEventListener('click', closeModal);
-    jsonModal?.addEventListener('click', e => {
-      if (e.target === jsonModal) closeModal();
-    });
-  });
+        // Предпросмотр JSON
+        if (previewJsonBtn) {
+            previewJsonBtn.addEventListener('click', function() {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    alert('Сначала загрузите файл');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        jsonContent.textContent = JSON.stringify(json, null, 2);
+                        jsonModal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    } catch (error) {
+                        alert('Ошибка чтения JSON файла: ' + error.message);
+                    }
+                };
+                reader.readAsText(fileInput.files[0]);
+            });
+        }
+
+        // Закрытие модального окна
+        function closeModal() {
+            jsonModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        jsonModal.addEventListener('click', function(e) {
+            if (e.target === jsonModal) {
+                closeModal();
+            }
+        });
+
+        // Закрытие по кнопкам внутри модалки
+        jsonModal.querySelectorAll('button').forEach(function(btn) {
+            btn.addEventListener('click', closeModal);
+        });
+    })();
 </script>
