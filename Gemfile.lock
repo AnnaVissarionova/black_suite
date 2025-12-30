@@ -192,8 +192,8 @@ GEM
     parser (3.3.10.0)
       ast (~> 2.4.1)
       racc
-    pg (1.6.2-x64-mingw-ucrt)
-    pg (1.6.2-x86_64-linux)
+    pg (1.6.3-x64-mingw-ucrt)
+    pg (1.6.3-x86_64-linux)
     plotly-rails-js (1.39.2)
     pp (0.6.3)
       prettyprint
@@ -379,7 +379,7 @@ DEPENDENCIES
   importmap-rails
   jbuilder
   kamal
-  pg (~> 1.1)
+  pg (~> 1.6)
   plotly-rails-js
   propshaft
   puma (>= 5.0)
