@@ -76,37 +76,52 @@ class ExperimentsController < ApplicationController
 
   def download_json
     authorize @experiment
-    
+
     @latest_json = @experiment.json_results.order(created_at: :desc).first
-    
+
     if @latest_json && @latest_json.metadata.present?
       json_content = @latest_json.metadata.is_a?(String) ? @latest_json.metadata : @latest_json.metadata.to_json
-      
+
       send_data json_content,
                 filename: "#{@experiment.name.parameterize}_results.json",
                 type: 'application/json',
                 disposition: 'attachment'
     else
-      redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id), 
+      redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id),
                   alert: 'JSON файл не найден'
     end
   end
 
   def update_sharing
     authorize @experiment, :manage_sharing?
+
     if params[:enable_sharing] == 'true'
       @experiment.regenerate_share_token! unless @experiment.shared?
-      redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id), notice: 'Доступ по ссылке включён'
+      render json: {
+        success: true,
+        shared: true,
+        share_token: @experiment.share_token,
+        share_url: shared_experiment_url(@experiment.share_token)
+      }
     else
       @experiment.disable_sharing!
-      redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id), notice: 'Доступ по ссылке отключён'
+      render json: {
+        success: true,
+        shared: false
+      }
     end
   end
 
   def regenerate_token
     authorize @experiment, :manage_sharing?
+
     @experiment.regenerate_share_token!
-    redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id), notice: 'Ссылка для доступа обновлена'
+    render json: {
+      success: true,
+      shared: true,
+      share_token: @experiment.share_token,
+      share_url: shared_experiment_url(@experiment.share_token)
+    }
   end
 
   def sharing

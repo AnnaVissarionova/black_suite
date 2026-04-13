@@ -29,6 +29,8 @@ Rails.application.routes.draw do
   # Маршруты для доступа по share_token
   get 'shared/project/:share_token', to: 'projects#show', as: :shared_project
   get 'shared/experiment/:share_token', to: 'experiments#show', as: :shared_experiment
+  get 'shared/project/:share_token/experiment/:experiment_id', to: 'projects#show_experiment', defaults: { partial: true }
+
   get "up" => "rails/health#show", as: :rails_health_check
   root 'projects#index'
 end

@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gray-50">
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+  <div class="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 py-6">
     <nav class="mb-6 text-sm">
       <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-700' %> ›
       <span class="text-gray-600 font-medium"><%= @project.name %></span>
@@ -13,37 +13,39 @@
         <% end %>
       </div>
 
-      <div class="flex items-center gap-2">
-        <%= render 'projects/sharing_settings', project: @project %>
+      <% if policy(@project).update? %>
+        <div class="flex items-center gap-2">
+          <%= render 'projects/sharing_settings', project: @project %>
 
-        <%= link_to edit_project_path(@project),
-                    class: 'inline-flex items-center px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-300 transition-all shadow-sm' do %>
-          <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
-          Редактировать
-        <% end %>
+          <%= link_to edit_project_path(@project),
+                      class: 'inline-flex items-center px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-300 transition-all shadow-sm' do %>
+            <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Редактировать
+          <% end %>
 
-        <%= link_to project_path(@project),
-                    data: {
-                      turbo_method: :delete,
-                      turbo_confirm: "Удалить проект «#{@project.name}»? Все эксперименты будут удалены. Это действие необратимо."
-                    },
-                    class: 'inline-flex items-center px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 hover:border-red-300 transition-all shadow-sm' do %>
-          <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-          </svg>
-          Удалить
-        <% end %>
+          <%= link_to project_path(@project),
+                      data: {
+                        turbo_method: :delete,
+                        turbo_confirm: "Удалить проект «#{@project.name}»? Все эксперименты будут удалены. Это действие необратимо."
+                      },
+                      class: 'inline-flex items-center px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 hover:border-red-300 transition-all shadow-sm' do %>
+            <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Удалить
+          <% end %>
 
-        <%= link_to new_project_experiment_path(@project),
-                    class: 'inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-all shadow-sm' do %>
-          <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Новый эксперимент
-        <% end %>
-      </div>
+          <%= link_to new_project_experiment_path(@project),
+                      class: 'inline-flex items-center px-4 py-2 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-all shadow-sm' do %>
+            <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Новый эксперимент
+          <% end %>
+        </div>
+      <% end %>
     </div>
 
     <% if @experiments.any? %>
@@ -66,28 +68,30 @@
                         <p class="text-xs text-gray-400 truncate mt-0.5"><%= experiment.description %></p>
                       <% end %>
                     </div>
-                    <div class="flex items-center space-x-1 ml-2 experiment-actions">
-                      <%= render partial: 'experiments/experiment_share_button',
-                                 locals: { experiment: experiment, project: @project } %>
-                      <%= link_to edit_project_experiment_path(@project, experiment),
-                                  class: "text-gray-300 hover:text-primary-500 p-1 transition",
-                                  title: "Редактировать" do %>
-                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      <% end %>
-                      <%= link_to project_experiment_path(@project, experiment),
-                                  data: {
-                                    turbo_method: :delete,
-                                    turbo_confirm: "Удалить эксперимент «#{experiment.name}»?"
-                                  },
-                                  class: "text-gray-300 hover:text-red-500 p-1 transition",
-                                  title: "Удалить" do %>
-                        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      <% end %>
-                    </div>
+                    <% if policy(@project).update? %>
+                      <div class="flex items-center space-x-1 ml-2 experiment-actions">
+                        <%= render partial: 'experiments/experiment_share_button',
+                                   locals: { experiment: experiment, project: @project } %>
+                        <%= link_to edit_project_experiment_path(@project, experiment),
+                                    class: "text-gray-300 hover:text-primary-500 p-1 transition",
+                                    title: "Редактировать" do %>
+                          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                        <% end %>
+                        <%= link_to project_experiment_path(@project, experiment),
+                                    data: {
+                                      turbo_method: :delete,
+                                      turbo_confirm: "Удалить эксперимент «#{experiment.name}»?"
+                                    },
+                                    class: "text-gray-300 hover:text-red-500 p-1 transition",
+                                    title: "Удалить" do %>
+                          <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        <% end %>
+                      </div>
+                    <% end %>
                   </div>
                   <div class="text-xs text-gray-300 mt-1"><%= ru_time_ago_in_words(experiment.created_at) %></div>
                 </div>
@@ -97,7 +101,7 @@
         </div>
 
         <div class="lg:w-2/3 xl:w-3/4">
-          <div id="experiment-content" 
+          <div id="experiment-content"
                class="bg-white rounded-xl shadow-sm border border-gray-100 min-h-[400px] flex items-center justify-center">
             <div class="text-center py-12 px-4">
               <svg class="mx-auto h-16 w-16 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,66 +130,93 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const experimentItems = document.querySelectorAll('.experiment-list-item');
-    const contentArea = document.getElementById('experiment-content');
+    document.addEventListener('turbo:load', function() {
+        const experimentItems = document.querySelectorAll('.experiment-list-item');
+        const contentArea = document.getElementById('experiment-content');
 
-    experimentItems.forEach(item => {
-      item.addEventListener('click', function(e) {
-        // Игнорируем клики по кнопкам редактирования и удаления
-        if (e.target.closest('.experiment-actions a')) return;
+        const isSharedProject = window.location.pathname.includes('/shared/project/');
+        const isSharedExperiment = window.location.pathname.includes('/shared/experiment/');
+        let shareToken = null;
 
-        const experimentId = this.dataset.experimentId;
-        const projectId = this.dataset.projectId;
+        if (isSharedProject || isSharedExperiment) {
+            const matches = window.location.pathname.match(/\/shared\/(?:project|experiment)\/([^\/?#]+)/);
+            if (matches) {
+                shareToken = matches[1];
+            }
+            console.log('Shared mode:', isSharedProject ? 'project' : 'experiment', 'Token:', shareToken);
+        }
 
-        // Убираем активный класс со всех элементов
-        experimentItems.forEach(el => {
-          el.classList.remove('bg-primary-50', 'border-l-4', 'border-primary-500');
-        });
+        if (isSharedExperiment) {
+            console.log('Shared experiment page - no AJAX needed');
+            return;
+        }
 
-        // Добавляем активный класс текущему элементу
-        this.classList.add('bg-primary-50', 'border-l-4', 'border-primary-500');
+        experimentItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (e.target.closest('.experiment-actions a')) return;
 
-        contentArea.innerHTML = `
+                const experimentId = this.dataset.experimentId;
+                const projectId = this.dataset.projectId;
+
+                let url;
+
+                if (isSharedProject && shareToken) {
+                    url = window.location.origin + '/shared/project/' + shareToken  + '/experiment/' + experimentId + '?partial=true';
+                    console.log('Shared PROJECT URL (goes to projects#show_experiment):', url);
+                } else if (projectId) {
+                    url = window.location.origin + '/projects/' + projectId + '/experiment/' + experimentId + '?partial=true';
+                    console.log('Regular URL:', url);
+                } else {
+                    console.error('No valid mode detected');
+                    return;
+                }
+
+                experimentItems.forEach(el => {
+                    el.classList.remove('bg-primary-50', 'border-l-4', 'border-primary-500');
+                });
+
+                this.classList.add('bg-primary-50', 'border-l-4', 'border-primary-500');
+
+                contentArea.innerHTML = `
           <div class="flex items-center justify-center py-12">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
             <span class="ml-3 text-gray-500">Загрузка...</span>
           </div>
         `;
 
-          fetch('/projects/' + projectId + '/experiment/' + experimentId + '?partial=true', {
-              headers: {
-                  'Accept': 'text/html',
-                  'X-Requested-With': 'XMLHttpRequest',
-                  'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-              }
-          })
-              .then(response => {
-                  if (!response.ok) throw new Error('Network response was not ok');
-                  return response.text();
-              })
-              .then(html => {
-                  contentArea.innerHTML = html;
-                  contentArea.classList.remove('flex', 'items-center', 'justify-center');
+                fetch(url, {
+                    headers: {
+                        'Accept': 'text/html',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.text();
+                    })
+                    .then(html => {
+                        contentArea.innerHTML = html;
+                        contentArea.classList.remove('flex', 'items-center', 'justify-center');
 
-                  if (typeof Plotly === 'undefined') {
-                  } else {
-                      setTimeout(() => {
-                          if (window.initExperimentPlots) {
-                              window.initExperimentPlots();
-                          }
-                      }, 100);
-                  }
-              })
-              .catch(error => {
-                  console.error('Error loading experiment:', error);
-                  contentArea.innerHTML = `
-    <div class="text-center py-12 text-red-500">
-      <p>Ошибка загрузки эксперимента</p>
-    </div>
-  `;
-              });
-      });
+                        if (typeof Plotly !== 'undefined') {
+                            setTimeout(() => {
+                                if (window.initExperimentPlots) {
+                                    window.initExperimentPlots();
+                                }
+                            }, 100);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading experiment:', error);
+                        contentArea.innerHTML = `
+              <div class="text-center py-12 text-red-500">
+                <p>Ошибка загрузки эксперимента</p>
+                <p class="text-sm mt-2">${error.message}</p>
+              </div>
+            `;
+                    });
+            });
+        });
     });
-  });
 </script>

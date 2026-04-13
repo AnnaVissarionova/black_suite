@@ -12,21 +12,49 @@ class ProjectsController < ApplicationController
   end
 
   def show
-    authorize @project
+    if params[:share_token].present?
+      @project = Project.find_by(share_token: params[:share_token])
+      unless @project&.shared?
+        redirect_to root_path, alert: 'Проект не найден или доступ ограничен'
+        return
+      end
+      @experiments = @project.experiments
+                             .select(:id, :name, :description, :created_at, :project_id)
+                             .order(created_at: :desc)
+      render :show
+      return
+    end
 
+    authorize @project
     @experiments = @project.experiments
                            .select(:id, :name, :description, :created_at, :project_id)
                            .order(created_at: :desc)
   end
 
   def show_experiment
-    authorize @project
+    if params[:share_token].present?
+      @project = Project.find_by(share_token: params[:share_token])
+      unless @project&.shared?
+        render plain: 'Access denied', status: :unauthorized
+        return
+      end
 
-    @experiment = @project.experiments
-                          .includes(:json_results)
-                          .find(params[:experiment_id])
+      if params[:experiment_id].present?
+        @experiment = @project.experiments.find(params[:experiment_id])
+      else
+        @experiment = @project.experiments.find_by(share_token: params[:share_token])
+      end
 
-    authorize @experiment, :show?
+      @experiments = @project.experiments
+                             .select(:id, :name, :description, :created_at, :project_id)
+                             .order(created_at: :desc)
+    else
+      authorize @project
+      @experiment = @project.experiments
+                            .includes(:json_results)
+                            .find(params[:experiment_id])
+      authorize @experiment, :show?
+    end
 
     @latest_json = @experiment.json_results.max_by(&:created_at)
     @json_results_count = @experiment.json_results_count
