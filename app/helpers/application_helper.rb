@@ -1,13 +1,13 @@
 module ApplicationHelper
-  # def pluralize(count, one, few, many)
-  #   return "#{count} #{many}" if (count % 100).between?(11, 19)
-  #
-  #   case count % 10
-  #   when 1 then "#{count} #{one}"
-  #   when 2..4 then "#{count} #{few}"
-  #   else "#{count} #{many}"
-  #   end
-  # end
+  def pluralize(count, one, few, many)
+    return "#{count} #{many}" if (count % 100).between?(11, 19)
+
+    case count % 10
+    when 1 then "#{count} #{one}"
+    when 2..4 then "#{count} #{few}"
+    else "#{count} #{many}"
+    end
+  end
   def flash_class(type)
     case type.to_s
     when 'notice', 'success'

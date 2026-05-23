@@ -5,8 +5,12 @@
       <span class="text-gray-600 font-medium"><%= @project.name %></span>
     </nav>
 
+
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
       <div>
+       <span class="items-center p-1 rounded text-xs font-mono bg-gray-100 text-gray-400">
+         ID <%= @project.id %>
+       </span>
         <h1 class="text-2xl font-bold text-gray-800"><%= @project.name %></h1>
         <% if @project.description.present? %>
           <p class="text-gray-500 mt-1 text-sm whitespace-pre-line"><%= @project.description %></p>

@@ -8,7 +8,7 @@
       </div>
       <div class="ml-3">
         <h3 class="text-sm font-medium text-red-800">
-          <%= pluralize(object.errors.count, 'ошибка', 'ошибок') %> при сохранении:
+          <%= pluralize(object.errors.count, 'ошибка', 'ошибки', 'ошибок') %> при сохранении:
         </h3>
         <ul class="mt-2 text-sm text-red-700 list-disc list-inside space-y-1">
           <% object.errors.full_messages.each do |message| %>

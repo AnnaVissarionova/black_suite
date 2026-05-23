@@ -30,17 +30,19 @@
         </div>
 
         <div class="flex items-center space-x-4">
-          <div class="hidden md:flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-lg">
-            <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-sm">
-              <span class="text-white font-medium text-sm">
-                <%= current_user.email[0].upcase %>
-              </span>
-            </div>
+          <%= link_to profile_path, class: "text-gray-600 hover:text-primary-500 transition" do %>
+            <div class="hidden md:flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-lg">
+              <div class="h-8 w-8 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center shadow-sm">
+                <span class="text-white font-medium text-sm">
+                  <%= current_user.email[0].upcase %>
+                </span>
+              </div>
 
-            <div class="text-sm">
-              <p class="font-medium text-gray-600"><%= current_user.email %></p>
+              <div class="text-sm">
+                <p class="font-medium text-gray-600"><%= current_user.email %></p>
+              </div>
             </div>
-          </div>
+          <% end %>
 
           <%= button_to destroy_user_session_path,
                         method: :delete,

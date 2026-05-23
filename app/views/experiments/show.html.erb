@@ -1,82 +1,18 @@
 <div class="min-h-screen bg-gray-50 py-8">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <nav class="mb-8 text-sm text-gray-400">
-      <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-700' %> ›
-      <%= link_to @experiment.project.name, @experiment.project, class: 'text-primary-600 hover:text-primary-700' %> ›
-      <span class="text-gray-600 font-medium"><%= @experiment.name %></span>
-    </nav>
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<!--    <nav class="mb-8 text-sm text-gray-400">-->
+<!--      <%#= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-700' %> ›-->
+<!--      <%#= link_to @experiment.project.name, @experiment.project, class: 'text-primary-600 hover:text-primary-700' %> ›-->
+<!--      <span class="text-gray-600 font-medium"><%#= @experiment.name %></span>-->
+<!--    </nav>-->
 
-    <div class="mb-8">
-      <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-        <div class="flex-1">
-          <h1 class="text-2xl font-bold text-gray-800"><%= @experiment.name %></h1>
-          <% if @experiment.description.present? %>
-            <p class="text-gray-500 mt-1 text-sm whitespace-pre-line"><%= @experiment.description %></p>
-          <% end %>
-        </div>
-        </div>
-
-        <% if policy(@experiment).update? %>
-          <%= render 'experiments/action_buttons',
-                     project: @project,
-                     experiment: @experiment,
-                     json_results_count: @json_results_count %>
-        <% end %>
-      </div>
-    </div>
-
-    <% if @json_results_count == 0 %>
-      <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
-        <svg class="mx-auto h-16 w-16 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-        </svg>
-        <h3 class="mt-4 text-lg font-medium text-gray-600">Пока нет результатов</h3>
-        <p class="mt-2 text-gray-400 text-sm">Загрузите JSON файл для визуализации данных оптимизации</p>
-      </div>
-    <% elsif @latest_json&.valid_json? %>
-      <!-- Статистика -->
-      <%= render 'experiments/stats_panel', stats: @stats, json_result: @latest_json %>
-
-      <!-- Выбор параметров (для многомерных данных) -->
-      <% if @stats[:dimension] > 2 %>
-        <%= render 'experiments/param_selector',
-                   experiment: @experiment,
-                   variables: @stats[:variables],
-                   selected_x: params[:param_x]&.to_i || 0,
-                   selected_y: params[:param_y]&.to_i || 1 %>
-      <% end %>
-
-      <div data-controller="lazy-plot"
-           data-lazy-plot-plot3d-value="<%= @plot_3d_data.to_json %>"
-           data-lazy-plot-fitness-history-value="<%= @fitness_history_data.to_json %>">
-
-        <!-- 3D График -->
-        <%= render 'experiments/plot_3d' %>
-
-        <!-- График истории fitness -->
-        <%= render 'experiments/fitness_history_plot' %>
-      </div>
-    <% end %>
+    <%= render partial: 'experiments/experiment_partial',
+               locals: { experiment: @experiment, project: @project,
+                         json_results_count: @json_results_count,
+                         stats: @stats, latest_json: @latest_json,
+                         plot_3d_data: @plot_3d_data,
+                         fitness_history_data: @fitness_history_data
+               } %>
   </div>
 </div>
 
-<style>
-  #optimization-plot, #fitness-history-plot {
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-  }
-</style>
-
-<script>
-  function resetCamera() {
-    if (typeof Plotly !== 'undefined') {
-      Plotly.relayout('optimization-plot', { 'scene.camera.eye': { x: 1.5, y: 1.5, z: 1.5 } });
-    }
-  }
-
-  function downloadPlot() {
-    if (typeof Plotly !== 'undefined') {
-      Plotly.downloadImage(document.getElementById('optimization-plot'), { format: 'png', filename: 'optimization_plot' });
-    }
-  }
-</script>

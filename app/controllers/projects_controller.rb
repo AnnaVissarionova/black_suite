@@ -365,7 +365,6 @@ class ProjectsController < ApplicationController
   end
 
   def authenticate_with_api_token!
-    @current_user = User.find_by(api_token: 'a054ba540a3863328505872bee7580b26e4b7ade44391cc66b34ca86fcd2c553')
     api_token = request.headers['Authorization']&.gsub(/Bearer\s+/, '')
 
     Rails.logger.info "API Token received: #{api_token.inspect}"

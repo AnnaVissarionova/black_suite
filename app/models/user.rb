@@ -18,6 +18,10 @@ class User < ApplicationRecord
     self.api_token = SecureRandom.hex(32)
   end
 
+  def regenerate_api_token!
+    update!(api_token: SecureRandom.hex(32))
+  end
+
   def ensure_api_token
     generate_api_token if api_token.blank?
   end

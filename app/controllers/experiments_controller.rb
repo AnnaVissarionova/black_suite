@@ -87,7 +87,7 @@ class ExperimentsController < ApplicationController
                 type: 'application/json',
                 disposition: 'attachment'
     else
-      redirect_to experiment_view_project_path(@project, experiment_id: @experiment.id),
+      redirect_to project_path(@project),
                   alert: 'JSON файл не найден'
     end
   end

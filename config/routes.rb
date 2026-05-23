@@ -26,6 +26,11 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :profile, only: [:show], controller: 'profiles' do
+    patch 'update_password'
+    post 'regenerate_token'
+  end
+
   # API для добавления результата эксперимента
   post 'api/add_experiment_result', to: 'projects#api_add_experiment_result'
 
