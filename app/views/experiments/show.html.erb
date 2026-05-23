@@ -11,14 +11,15 @@
         <div class="flex-1">
           <h1 class="text-2xl font-bold text-gray-800"><%= @experiment.name %></h1>
           <% if @experiment.description.present? %>
-            <p class="text-gray-500 mt-1 text-sm"><%= @experiment.description %></p>
+            <p class="text-gray-500 mt-1 text-sm whitespace-pre-line"><%= @experiment.description %></p>
           <% end %>
+        </div>
         </div>
 
         <% if policy(@experiment).update? %>
-          <%= render 'experiments/action_buttons', 
-                     project: @project, 
-                     experiment: @experiment, 
+          <%= render 'experiments/action_buttons',
+                     project: @project,
+                     experiment: @experiment,
                      json_results_count: @json_results_count %>
         <% end %>
       </div>
@@ -38,7 +39,7 @@
 
       <!-- Выбор параметров (для многомерных данных) -->
       <% if @stats[:dimension] > 2 %>
-        <%= render 'experiments/param_selector', 
+        <%= render 'experiments/param_selector',
                    experiment: @experiment,
                    variables: @stats[:variables],
                    selected_x: params[:param_x]&.to_i || 0,
@@ -48,10 +49,10 @@
       <div data-controller="lazy-plot"
            data-lazy-plot-plot3d-value="<%= @plot_3d_data.to_json %>"
            data-lazy-plot-fitness-history-value="<%= @fitness_history_data.to_json %>">
-        
+
         <!-- 3D График -->
         <%= render 'experiments/plot_3d' %>
-        
+
         <!-- График истории fitness -->
         <%= render 'experiments/fitness_history_plot' %>
       </div>

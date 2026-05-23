@@ -3,6 +3,9 @@ class ProjectsController < ApplicationController
 
   before_action :set_project, only: %i[show edit update destroy update_sharing disable_sharing regenerate_token sharing show_experiment]
 
+  skip_before_action :verify_authenticity_token, only: [:api_add_experiment_result]
+  skip_before_action :authenticate_user_or_check_shared_access!, only: [:api_add_experiment_result]
+
   def index
     redirect_to new_user_session_path, alert: 'Необходимо войти в систему' and return unless current_user
 
@@ -248,6 +251,68 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def api_add_experiment_result
+    authenticate_with_api_token!
+    return if performed?
+
+
+    unless params[:project_id].present? && params[:json_file].present?
+      render json: {
+        success: false,
+        error: 'Missing required parameters: project_id, json_file'
+      }, status: :bad_request
+      return
+    end
+
+    project = @current_user.projects.find_by(id: params[:project_id])
+    unless project
+      render json: {
+        success: false,
+        error: 'Project not found'
+      }, status: :not_found
+      return
+    end
+
+    experiment_name = params[:experiment_name].presence || 'Эксперимент без названия'
+    experiment = project.experiments.create!(
+      name: experiment_name,
+      description: "Автоматически создан через API \n #{Time.current}"
+    )
+
+    # Парсим JSON
+    begin
+      json_data = JSON.parse(params[:json_file].read)
+    rescue JSON::ParserError => e
+      render json: {
+        success: false,
+        error: "Invalid JSON format: #{e.message}"
+      }, status: :bad_request
+      return
+    end
+
+    # Сохраняем результат
+    json_result = JsonResult.create!(
+      experiment: experiment,
+      metadata: json_data
+    )
+
+    render json: {
+      success: true,
+      message: 'Experiment result added successfully',
+      data: {
+        experiment_id: experiment.id,
+        experiment_name: experiment.name,
+        json_result_id: json_result.id
+      }
+    }, status: :created
+
+  rescue => e
+    render json: {
+      success: false,
+      error: e.message
+    }, status: :internal_server_error
+  end
+
   private
 
   def generate_unique_token
@@ -297,5 +362,28 @@ class ProjectsController < ApplicationController
     else
       redirect_to root_path, alert: 'Проект не найден или доступ ограничен'
     end
+  end
+
+  def authenticate_with_api_token!
+    @current_user = User.find_by(api_token: 'a054ba540a3863328505872bee7580b26e4b7ade44391cc66b34ca86fcd2c553')
+    api_token = request.headers['Authorization']&.gsub(/Bearer\s+/, '')
+
+    Rails.logger.info "API Token received: #{api_token.inspect}"
+
+    if api_token.blank?
+      render json: { success: false, error: 'API token required' }, status: :unauthorized
+      return
+    end
+
+    @current_user = User.find_by(api_token: api_token)
+
+    Rails.logger.info "User found: #{@current_user.inspect}"
+
+    unless @current_user
+      render json: { success: false, error: 'Invalid API token' }, status: :unauthorized
+      return
+    end
+
+
   end
 end

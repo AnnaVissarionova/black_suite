@@ -1,9 +1,9 @@
 <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
   <div class="max-w-2xl mx-auto">
     <nav class="mb-8 text-sm">
-      <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-700' %> › 
-      <%= link_to @project.name, project_path(@project), class: 'text-primary-600 hover:text-primary-700' %> › 
-      <%= link_to @experiment.name, experiment_view_project_path(@project, experiment_id: @experiment.id), class: 'text-primary-600 hover:text-primary-700' %> › 
+      <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-700' %> ›
+      <%= link_to @project.name, project_path(@project), class: 'text-primary-600 hover:text-primary-700' %> ›
+      <%= link_to @experiment.name, experiment_view_project_path(@project, experiment_id: @experiment.id), class: 'text-primary-600 hover:text-primary-700' %> ›
       <span class="text-gray-600 font-medium">Редактирование</span>
     </nav>
 
@@ -18,7 +18,7 @@
 
         <div>
           <%= f.label :name, 'Название эксперимента', class: 'block text-sm font-medium text-gray-700 mb-2' %>
-          <%= f.text_field :name, 
+          <%= f.text_field :name,
                           required: true,
                           class: 'w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition' %>
         </div>
@@ -32,12 +32,12 @@
 
         <div class="border-t border-gray-100 pt-6">
           <h3 class="text-sm font-medium text-gray-700 mb-4">Данные результатов</h3>
-          
-          <% 
-            latest_json = @experiment.json_results.order(created_at: :desc).first 
+
+          <%
+            latest_json = @experiment.json_results.order(created_at: :desc).first
             has_json = latest_json.present?
           %>
-          
+
           <% if has_json %>
             <div class="bg-primary-50 border border-primary-100 rounded-lg p-4 mb-4">
               <div class="flex items-center justify-between">
@@ -99,9 +99,9 @@
         </div>
 
         <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-100">
-          <%= link_to 'Отмена', experiment_view_project_path(@project, experiment_id: @experiment.id), 
+          <%= link_to 'Отмена', project_path(@project),
                       class: 'px-4 py-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition' %>
-          <%= f.submit 'Сохранить изменения', 
+          <%= f.submit 'Сохранить изменения',
                       class: 'px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition font-medium cursor-pointer' %>
         </div>
       <% end %>

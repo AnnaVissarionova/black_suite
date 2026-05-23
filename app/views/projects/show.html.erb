@@ -9,7 +9,7 @@
       <div>
         <h1 class="text-2xl font-bold text-gray-800"><%= @project.name %></h1>
         <% if @project.description.present? %>
-          <p class="text-gray-500 mt-1 text-sm"><%= @project.description %></p>
+          <p class="text-gray-500 mt-1 text-sm whitespace-pre-line"><%= @project.description %></p>
         <% end %>
       </div>
 
@@ -65,7 +65,7 @@
                     <div class="flex-1 min-w-0">
                       <h3 class="text-sm font-medium text-gray-800 truncate"><%= experiment.name %></h3>
                       <% if experiment.description.present? %>
-                        <p class="text-xs text-gray-400 truncate mt-0.5"><%= experiment.description %></p>
+                        <p class="text-xs text-gray-400 truncate mt-0.5 text-sm whitespace-pre-line"><%= experiment.description %></p>
                       <% end %>
                     </div>
                     <% if policy(@project).update? %>

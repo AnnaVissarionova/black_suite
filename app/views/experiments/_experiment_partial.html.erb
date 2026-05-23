@@ -4,7 +4,7 @@
       <div class="flex-1">
         <h2 class="text-xl font-bold text-gray-800"><%= @experiment.name %></h2>
         <% if @experiment.description.present? %>
-          <p class="text-gray-500 mt-1 text-sm"><%= @experiment.description %></p>
+          <p class="text-gray-500 mt-1 text-sm whitespace-pre-line"><%= @experiment.description %></p>
         <% end %>
       </div>
 

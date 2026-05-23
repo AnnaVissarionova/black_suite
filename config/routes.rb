@@ -26,6 +26,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # API для добавления результата эксперимента
+  post 'api/add_experiment_result', to: 'projects#api_add_experiment_result'
+
   # Маршруты для доступа по share_token
   get 'shared/project/:share_token', to: 'projects#show', as: :shared_project
   get 'shared/experiment/:share_token', to: 'experiments#show', as: :shared_experiment
