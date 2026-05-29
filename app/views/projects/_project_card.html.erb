@@ -1,4 +1,4 @@
-<div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-6 border border-gray-100 border-t-4 border-t-primary-400 relative h-full flex flex-col">
+<div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-6 border border-4 border-secondary-200 relative h-full flex flex-col">
   <div class="absolute top-2 left-6">
     <span class="inline-flex items-center px-1 py-0.5 rounded text-xs font-mono bg-gray-100 text-gray-400">
      ID <%= project.id %>
@@ -13,7 +13,7 @@
         </h3>
         <div class="min-h-[40px]">
           <% if project.description.present? %>
-            <p class="text-gray-500 text-sm mb-3 line-clamp-2"><%= project.description %></p>
+            <p class="text-gray-500 text-sm mb-3 truncate line-clamp-2"><%= project.description %></p>
           <% else %>
             <p class="text-gray-300 text-sm italic mb-3">Нет описания</p>
           <% end %>

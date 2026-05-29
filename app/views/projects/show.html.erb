@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50">
+<div class="h-full bg-gray-50">
   <div class="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8 py-6">
     <nav class="mb-6 text-sm">
       <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-700' %> ›
@@ -114,7 +114,8 @@
               <h3 class="mt-4 text-lg font-medium text-gray-400">Выберите эксперимент</h3>
               <p class="mt-1 text-sm text-gray-300">Нажмите на эксперимент слева для просмотра деталей</p>
             </div>
-          </div>
+            </div>
+          </turbo-frame>
         </div>
       </div>
     <% else %>
@@ -175,11 +176,11 @@
                     return;
                 }
 
-                experimentItems.forEach(el => {
-                    el.classList.remove('bg-primary-50', 'border-l-4', 'border-primary-500');
-                });
+                  // experimentItems.forEach(el => {
+                  //     el.classList.remove('bg-primary-50', 'border-l-4', 'border-primary-500');
+                  // });
 
-                this.classList.add('bg-primary-50', 'border-l-4', 'border-primary-500');
+                  // this.classList.add('bg-primary-50', 'border-l-4', 'border-primary-500');
 
                 contentArea.innerHTML = `
           <div class="flex items-center justify-center py-12">

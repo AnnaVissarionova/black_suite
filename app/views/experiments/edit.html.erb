@@ -1,9 +1,15 @@
+<%
+  latest_json = @experiment.json_results.order(created_at: :desc).first
+  has_json = latest_json.present?
+  current_json_data = has_json ? latest_json.metadata : {}
+%>
+
 <div class="min-h-screen bg-gray-50 py-6 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-2xl mx-auto">
+  <div class="max-w-6xl mx-auto">
     <nav class="mb-8 text-sm">
       <%= link_to 'Проекты', projects_path, class: 'text-primary-600 hover:text-primary-700' %> ›
       <%= link_to @project.name, project_path(@project), class: 'text-primary-600 hover:text-primary-700' %> ›
-      <%= link_to @experiment.name, experiment_view_project_path(@project, experiment_id: @experiment.id), class: 'text-primary-600 hover:text-primary-700' %> ›
+      <span class="text-gray-600"><%= @experiment.name%> ›</span>
       <span class="text-gray-600 font-medium">Редактирование</span>
     </nav>
 
@@ -12,172 +18,348 @@
       <p class="mt-2 text-gray-500 text-sm">Измените информацию об эксперименте «<%= @experiment.name %>»</p>
     </div>
 
-    <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-8">
-      <%= form_with model: [@project, @experiment], multipart: true, class: 'space-y-6' do |f| %>
+    <div class="bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
+      <%= form_with model: [@project, @experiment], multipart: true, local: true, class: 'flex flex-col' do |f| %>
         <%= render 'shared/error_messages', object: f.object %>
 
-        <div>
-          <%= f.label :name, 'Название эксперимента', class: 'block text-sm font-medium text-gray-700 mb-2' %>
-          <%= f.text_field :name,
-                          required: true,
-                          class: 'w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition' %>
-        </div>
+        <!-- Две колонки с основной информацией -->
+        <div class="p-8 pb-0">
+          <h3 class="text-base font-medium text-gray-700 border-b border-gray-100 pb-2 mb-6">Основная информация</h3>
 
-        <div>
-          <%= f.label :description, 'Описание', class: 'block text-sm font-medium text-gray-700 mb-2' %>
-          <%= f.text_area :description,
-                         rows: 4,
-                         class: 'w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition resize-none' %>
-        </div>
-
-        <div class="border-t border-gray-100 pt-6">
-          <h3 class="text-sm font-medium text-gray-700 mb-4">Данные результатов</h3>
-
-          <%
-            latest_json = @experiment.json_results.order(created_at: :desc).first
-            has_json = latest_json.present?
-          %>
-
-          <% if has_json %>
-            <div class="bg-primary-50 border border-primary-100 rounded-lg p-4 mb-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <svg class="h-5 w-5 text-primary-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <div>
-                    <p class="text-sm font-medium text-primary-700">Текущий JSON файл</p>
-                    <p class="text-xs text-primary-500"><%= ru_time_ago_in_words(latest_json.created_at) %></p>
-                  </div>
-                </div>
-                <%= link_to download_json_project_experiment_path(@project, @experiment),
-                            class: "text-xs px-3 py-1.5 bg-white border border-primary-200 rounded-lg text-primary-600 hover:bg-primary-50 transition" do %>
-                  Скачать
-                <% end %>
-              </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <%= f.label :name, 'Название эксперимента *', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+              <%= f.text_field :name,
+                               required: true,
+                               placeholder: 'Введите название эксперимента',
+                               class: 'w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition' %>
             </div>
-          <% end %>
 
-          <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 border-dashed rounded-lg hover:border-primary-300 transition cursor-pointer"
-               id="json-dropzone">
-            <div class="space-y-1 text-center">
-              <svg class="mx-auto h-10 w-10 text-gray-300" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-              <div class="flex text-sm text-gray-500 justify-center">
-                <span class="font-medium text-primary-600"><%= has_json ? 'Заменить файл' : 'Загрузите файл' %></span>
-                <p class="pl-1">или перетащите сюда</p>
-              </div>
-              <p class="text-xs text-gray-400">JSON файлы до 10MB</p>
+            <div>
+              <%= f.label :description, 'Описание', class: 'block text-sm font-medium text-gray-700 mb-2' %>
+              <%= f.text_area :description,
+                              rows: 3,
+                              placeholder: 'Опишите цели и задачи эксперимента...',
+                              class: 'w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-400 focus:border-primary-400 transition resize-none' %>
             </div>
           </div>
+        </div>
 
-          <%= file_field_tag :json_file,
-                            accept: '.json',
-                            class: 'hidden',
-                            id: 'json_file_input' %>
+        <!-- Данные результатов -->
+        <div class="p-8">
+          <h3 class="text-base font-medium text-gray-700 border-b border-gray-100 pb-2 mb-6">Данные результатов</h3>
 
-          <div id="new-file-preview" class="hidden mt-4 bg-green-50 border border-green-100 rounded-lg p-4">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Левая колонка - Drag & Drop зона -->
+            <div class="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 border-dashed rounded-lg hover:border-primary-300 transition cursor-pointer"
+                 id="json-dropzone">
+              <div class="space-y-1 text-center">
+                <svg class="mx-auto h-10 w-10 text-gray-300" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <div>
-                  <p id="new-file-name" class="text-sm font-medium text-green-700"></p>
-                  <p id="new-file-size" class="text-xs text-green-500"></p>
+                <div class="flex text-sm text-gray-500 justify-center">
+                  <span class="font-medium text-primary-600"><%= has_json ? 'Заменить файл' : 'Загрузите файл' %></span>
+                  <p class="pl-1">или перетащите сюда</p>
                 </div>
+                <p class="text-xs text-gray-400">JSON файлы до 10MB</p>
               </div>
-              <button type="button" id="clear-new-file" class="text-green-500 hover:text-green-700">
-                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </div>
+
+            <%= file_field_tag :json_file,
+                               accept: '.json',
+                               class: 'hidden',
+                               id: 'json_file_input' %>
+
+            <!-- Правая колонка - Текущий/Новый JSON файл -->
+            <div id="file-info-container" class="space-y-3">
+              <% if has_json %>
+                <div id="current-json-block" class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center">
+                      <svg class="h-5 w-5 text-gray-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <div>
+                        <p class="text-sm font-medium text-gray-700">Текущий JSON файл</p>
+                        <p class="text-xs text-gray-500"><%= ru_time_ago_in_words(latest_json.created_at) %></p>
+                      </div>
+                    </div>
+                    <%= link_to download_json_project_experiment_path(@project, @experiment),
+                                class: "text-xs px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition" do %>
+                      Скачать
+                    <% end %>
+                  </div>
+                  <button type="button" id="preview-current-json"
+                          class="w-full mt-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">
+                    <svg class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                    Предпросмотр
+                  </button>
+                </div>
+              <% end %>
+
+              <!-- Блок для нового файла  -->
+              <div id="new-json-block" class="hidden bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center">
+                    <svg class="h-5 w-5 text-primary-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                      <p id="new-file-name" class="text-sm font-medium text-gray-700"></p>
+                      <p id="new-file-size" class="text-xs text-gray-500"></p>
+                    </div>
+                  </div>
+                  <button type="button" id="clear-new-file" class="text-gray-400 hover:text-gray-600">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <button type="button" id="preview-new-json"
+                        class="w-full mt-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition">
+                  <svg class="h-4 w-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  Предпросмотр
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Третий ряд: Пример JSON файла -->
+        <div class="px-8 pb-8">
+          <div class="rounded-lg bg-gray-50 border border-gray-200 p-4">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-sm font-medium text-gray-700">Пример структуры JSON:</h4>
+              <button type="button" id="copy-example-json"
+                      class="text-xs text-primary-500 hover:text-primary-600 flex items-center">
+                <svg class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                 </svg>
+                Копировать пример
               </button>
             </div>
+            <pre id="example-json" class="bg-white p-3 rounded border border-gray-200 overflow-x-auto text-xs"><code>{
+  "dimension": 4,
+  "names": ["b", "wm", "cy", "cz"],
+  "mins": [0.0, 0.0001, 0.004, 0.004],
+  "maxs": [0.8, 0.0005, 0.006, 0.006],
+  "best_fitness_history": [-0.547, -0.670, -0.689, -0.698],
+  "cache": {
+    "0.42_0.00012_0.0047_0.0059": {
+      "fitness": -0.0178,
+      "values": [0.421, 0.000123, 0.00473, 0.00596]
+    }
+  }
+}</code></pre>
           </div>
         </div>
 
-        <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-100">
+        <!-- Кнопки в футере -->
+        <div class="flex items-center justify-end space-x-4 px-8 py-6 bg-gray-50 border-t border-gray-100">
           <%= link_to 'Отмена', project_path(@project),
                       class: 'px-4 py-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition' %>
           <%= f.submit 'Сохранить изменения',
-                      class: 'px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition font-medium cursor-pointer' %>
+                       class: 'px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition font-medium cursor-pointer' %>
         </div>
       <% end %>
     </div>
   </div>
 </div>
 
+<!-- Модальное окно предпросмотра JSON -->
+<div id="json-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto z-50">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div class="flex justify-between items-center p-6 border-b">
+        <h3 class="text-lg font-medium text-gray-900">Предпросмотр JSON</h3>
+        <button type="button" id="close-modal" class="text-gray-400 hover:text-gray-500">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto max-h-[70vh]">
+        <pre id="json-content" class="bg-gray-50 p-4 rounded text-xs overflow-x-auto"></pre>
+      </div>
+      <div class="flex justify-end p-6 border-t">
+        <button type="button" id="close-modal-footer" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+          Закрыть
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-  (function() {
-    const dropzone = document.getElementById('json-dropzone');
-    const fileInput = document.getElementById('json_file_input');
-    const preview = document.getElementById('new-file-preview');
-    const fileName = document.getElementById('new-file-name');
-    const fileSize = document.getElementById('new-file-size');
-    const clearBtn = document.getElementById('clear-new-file');
+    (function() {
+        // Данные текущего JSON из Ruby
+        const currentJsonData = <%= raw current_json_data.to_json %>;
 
-    if (!dropzone || !fileInput) return;
+        const dropzone = document.getElementById('json-dropzone');
+        const fileInput = document.getElementById('json_file_input');
+        const currentJsonBlock = document.getElementById('current-json-block');
+        const newJsonBlock = document.getElementById('new-json-block');
+        const newFileName = document.getElementById('new-file-name');
+        const newFileSize = document.getElementById('new-file-size');
+        const clearNewFileBtn = document.getElementById('clear-new-file');
+        const previewCurrentBtn = document.getElementById('preview-current-json');
+        const previewNewBtn = document.getElementById('preview-new-json');
 
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      dropzone.addEventListener(eventName, e => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-    });
+        if (!dropzone || !fileInput) return;
 
-    ['dragenter', 'dragover'].forEach(eventName => {
-      dropzone.addEventListener(eventName, () => {
-        dropzone.classList.add('border-primary-400', 'bg-primary-50');
-      });
-    });
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, e => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
 
-    ['dragleave', 'drop'].forEach(eventName => {
-      dropzone.addEventListener(eventName, () => {
-        dropzone.classList.remove('border-primary-400', 'bg-primary-50');
-      });
-    });
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => {
+                dropzone.classList.add('border-primary-400', 'bg-primary-50');
+            });
+        });
 
-    dropzone.addEventListener('drop', e => {
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(files[0]);
-        fileInput.files = dataTransfer.files;
-        handleFile(files[0]);
-      }
-    });
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, () => {
+                dropzone.classList.remove('border-primary-400', 'bg-primary-50');
+            });
+        });
 
-    dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(files[0]);
+                fileInput.files = dataTransfer.files;
+                handleFile(files[0]);
+            }
+        });
 
-    fileInput.addEventListener('change', function() {
-      if (this.files.length > 0) {
-        handleFile(this.files[0]);
-      }
-    });
+        dropzone.addEventListener('click', () => fileInput.click());
 
-    function handleFile(file) {
-      if (!file.name.toLowerCase().endsWith('.json')) {
-        alert('Пожалуйста, загрузите файл в формате JSON');
-        fileInput.value = '';
-        return;
-      }
+        fileInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                handleFile(this.files[0]);
+            }
+        });
 
-      if (file.size > 10 * 1024 * 1024) {
-        alert('Файл слишком большой. Максимальный размер: 10MB');
-        fileInput.value = '';
-        return;
-      }
+        function handleFile(file) {
+            if (!file.name.toLowerCase().endsWith('.json')) {
+                alert('Пожалуйста, загрузите файл в формате JSON');
+                fileInput.value = '';
+                return;
+            }
 
-      fileName.textContent = file.name;
-      fileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
-      preview.classList.remove('hidden');
-    }
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Файл слишком большой. Максимальный размер: 10MB');
+                fileInput.value = '';
+                return;
+            }
 
-    clearBtn?.addEventListener('click', () => {
-      fileInput.value = '';
-      preview.classList.add('hidden');
-    });
-  })();
+            // Скрываем старый блок, показываем новый
+            if (currentJsonBlock) {
+                currentJsonBlock.style.display = 'none';
+            }
+
+            newFileName.textContent = file.name;
+            newFileSize.textContent = (file.size / 1024).toFixed(2) + ' KB';
+            newJsonBlock.classList.remove('hidden');
+        }
+
+        clearNewFileBtn?.addEventListener('click', () => {
+            fileInput.value = '';
+            newJsonBlock.classList.add('hidden');
+
+            if (currentJsonBlock) {
+                currentJsonBlock.style.display = 'block';
+            }
+        });
+
+        // Предпросмотр текущего JSON
+        if (previewCurrentBtn) {
+            previewCurrentBtn.addEventListener('click', function() {
+                const jsonContent = document.getElementById('json-content');
+                const jsonModal = document.getElementById('json-modal');
+
+                if (currentJsonData && Object.keys(currentJsonData).length > 0) {
+                    jsonContent.textContent = JSON.stringify(currentJsonData, null, 2);
+                    jsonModal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    alert('Нет данных для предпросмотра');
+                }
+            });
+        }
+
+        // Предпросмотр нового JSON
+        if (previewNewBtn) {
+            previewNewBtn.addEventListener('click', function() {
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    alert('Сначала загрузите файл');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const json = JSON.parse(e.target.result);
+                        const jsonContent = document.getElementById('json-content');
+                        const jsonModal = document.getElementById('json-modal');
+                        jsonContent.textContent = JSON.stringify(json, null, 2);
+                        jsonModal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    } catch (error) {
+                        alert('Ошибка чтения JSON файла: ' + error.message);
+                    }
+                };
+                reader.readAsText(fileInput.files[0]);
+            });
+        }
+
+        // Закрытие модального окна
+        function closeModal() {
+            const modal = document.getElementById('json-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        document.getElementById('close-modal')?.addEventListener('click', closeModal);
+        document.getElementById('close-modal-footer')?.addEventListener('click', closeModal);
+
+        const modal = document.getElementById('json-modal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Копирование примера JSON
+        const copyExampleBtn = document.getElementById('copy-example-json');
+        const exampleJson = document.getElementById('example-json');
+
+        if (copyExampleBtn && exampleJson) {
+            copyExampleBtn.addEventListener('click', function() {
+                const jsonText = exampleJson.textContent || exampleJson.innerText;
+                navigator.clipboard.writeText(jsonText).then(() => {
+                    const originalHtml = copyExampleBtn.innerHTML;
+                    copyExampleBtn.innerHTML = '<svg class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>Скопировано!';
+                    setTimeout(() => {
+                        copyExampleBtn.innerHTML = originalHtml;
+                    }, 2000);
+                });
+            });
+        }
+    })();
 </script>

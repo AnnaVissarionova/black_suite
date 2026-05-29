@@ -1,11 +1,26 @@
-<div class="bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4">
+<div class="bg-gradient-to-br from-primary-800 to-secondary-800 flex items-center justify-center p-4">
   <div class="max-w-md w-full">
     <div class="text-center mb-4">
+      <div class="flex justify-center">
+        <div class="h-16 w-16 text-primary-600">
+          <svg viewBox="0 0 48 48" fill="currentColor">
+            <polygon points="10.807 14.858 5.5 24.053 10.777 33.195 16.084 24 10.807 14.858" fill="#7c3aed" stroke="#6d28d9" stroke-width="0.5"></polygon>
+            <polygon points="16.084 24 10.777 33.195 21.331 33.195 26.639 24 16.084 24" fill="#8b5cf6" stroke="#6d28d9" stroke-width="0.5"></polygon>
+            <polygon points="10.807 14.858 16.084 24 26.639 24 21.361 14.858 10.807 14.858" fill="#a78bfa" stroke="#6d28d9" stroke-width="0.5"></polygon>
+            <polygon points="26.669 5.662 21.361 14.858 26.639 24 31.946 14.805 26.669 5.662" fill="#7c3aed" stroke="#6d28d9" stroke-width="0.5"></polygon>
+            <polygon points="31.946 14.805 26.639 24 37.193 24 42.5 14.805 31.946 14.805" fill="#8b5cf6" stroke="#6d28d9" stroke-width="0.5"></polygon>
+            <polygon points="26.669 5.662 31.946 14.805 42.5 14.805 37.223 5.662 26.669 5.662" fill="#a78bfa" stroke="#6d28d9" stroke-width="0.5"></polygon>
+            <polygon points="26.639 24 21.331 33.195 26.608 42.338 31.916 33.142 26.639 24" fill="#7c3aed" stroke="#6d28d9" stroke-width="0.5"></polygon>
+            <polygon points="31.916 33.142 26.608 42.338 37.163 42.338 42.47 33.142 31.916 33.142" fill="#8b5cf6" stroke="#6d28d9" stroke-width="0.5"></polygon>
+            <polygon points="26.639 24 31.916 33.142 42.47 33.142 37.193 24 26.639 24" fill="#a78bfa" stroke="#6d28d9" stroke-width="0.5"></polygon>
+          </svg>
+        </div>
+      </div>
       <h2 class="mt-6 text-3xl font-extrabold text-gray-900">BlackSuite</h2>
-      <p class="mt-2 text-sm text-gray-600">Создайте аккаунт</p>
+      <p class="mt-2 text-sm text-gray-600">Войдите в свой аккаунт</p>
     </div>
 
-    <div class="bg-white rounded-lg shadow-xl p-4 sm:p-5">
+    <div class="bg-white rounded-lg shadow-xl p-4 sm:p-5 mb-10">
       <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: 'space-y-6' }) do |f| %>
         <%= render "devise/shared/error_messages", resource: resource %>
 
@@ -34,7 +49,7 @@
 
         <div>
           <%= f.submit 'Зарегистрироваться',
-                       class: 'w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-purple-400 hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition' %>
+                       class: 'w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white hover:bg-[#465280] bg-[#6b79b0] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition' %>
         </div>
       <% end %>
 
