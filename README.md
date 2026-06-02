@@ -1,24 +1,56 @@
-# README
+# BlackSuite
+Веб-приложение для визуализации и анализа результатов оптимизационных экспериментов. Позволяет загружать JSON-файлы с результатами, строить интерактивные 3D-графики, управлять проектами и экспериментами, а также делиться результатами через публичные ссылки. 
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Возможности
+- Управление проектами и экспериментами (CRUD операции)
 
-Things you may want to cover:
+- Загрузка JSON-файлов с результатами оптимизации
 
-* Ruby version
+- Интерактивная 3D-визуализация с Plotly.js
 
-* System dependencies
+- Публичный доступ к проектам и экспериментам по ссылке
 
-* Configuration
+- Личный кабинет с управлением API-токеном
 
-* Database creation
+- REST API для программной загрузки результатов
 
-* Database initialization
+- Интеграция с ИИ для гибкого построения графиков
 
-* How to run the test suite
 
-* Services (job queues, cache servers, search engines, etc.)
+## Технологический стек
+Backend: Ruby on Rails 8
 
-* Deployment instructions
+Frontend: Tailwind CSS, Stimulus, Turbo
 
-* ...
+Визуализация: Plotly.js
+
+База данных: PostgreSQL
+
+
+## Установка и запуск
+```
+# Клонирование репозитория
+git clone https://github.com/AnnaVissarionova/black_suite.git
+cd black_suite
+
+# Установка зависимостей
+bundle install
+
+# Настройка базы данных
+rails db:create
+rails db:migrate
+
+# Запуск сервера
+rails server
+```
+
+## API
+curl -X POST http://localhost:3000/api/add_experiment_result \
+  -H "Authorization: Bearer YOUR_API_TOKEN" \
+  -F "project_id=1" \
+  -F "json_file=@result.json" \
+  -F "experiment_name=Название эксперимента"
+
+Аутентификация: Devise + API токены
+
+Развертывание: Kamal + Docker
