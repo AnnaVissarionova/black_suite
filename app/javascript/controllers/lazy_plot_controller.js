@@ -107,9 +107,9 @@ export default class extends Controller {
     }
 
     const layout = {
-      title: { text: 'История fitness', font: { size: 16 } },
+      title: { text: 'История сходимости', font: { size: 16 } },
       xaxis: { title: 'Номер итерации', gridcolor: '#e5e7eb' },
-      yaxis: { title: 'Лучшее значение fitness', gridcolor: '#e5e7eb' },
+      yaxis: { title: 'Лучшее значение', gridcolor: '#e5e7eb' },
       margin: { l: 70, r: 20, b: 70, t: 50 },
       plot_bgcolor: 'white',
       paper_bgcolor: 'white'

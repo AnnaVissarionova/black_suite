@@ -57,6 +57,8 @@ servers:
   web:
     hosts:
       - acelan.ru
+    env:
+      RAILS_SERVE_STATIC_FILES: true
     proxy:
       ssl: true
       app_port: 3000
