@@ -1,6 +1,6 @@
-<div class="bg-gradient-to-br from-primary-800 to-secondary-800  flex items-center justify-center p-4">
+<div class="flex items-center justify-center p-4">
   <div class="max-w-md w-full">
-    <div class="text-center mb-4">
+    <div class="bg-white text-center mb-4">
       <div class="flex justify-center">
         <div class="h-16 w-16 text-primary-600">
           <svg viewBox="0 0 48 48" fill="currentColor">
@@ -38,12 +38,12 @@
                               class: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition' %>
         </div>
 
-        <% if devise_mapping.rememberable? %>
-          <div class="flex items-center">
-            <%= f.check_box :remember_me, class: 'h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded' %>
-            <%= f.label :remember_me, 'Запомнить меня', class: 'ml-2 block text-sm text-gray-900' %>
-          </div>
-        <% end %>
+        <%# if devise_mapping.rememberable? %>
+<!--          <div class="flex items-center">-->
+            <%#= f.check_box :remember_me, class: 'h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded' %>
+            <%#= f.label :remember_me, 'Запомнить меня', class: 'ml-2 block text-sm text-gray-900' %>
+<!--          </div>-->
+        <%# end %>
 
         <div>
           <%= f.submit 'Войти',

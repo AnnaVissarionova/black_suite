@@ -13,7 +13,7 @@
 
     <div class="bg-white shadow-sm rounded-xl border border-gray-100 p-8">
       <%= form_with model: [@project, @experiment], multipart: true, class: 'space-y-8', data: { controller: 'file-upload' } do |f| %>
-        <div>
+        <div class="px-8">
           <h3 class="text-base font-medium text-gray-700 border-b border-gray-100 pb-2 mb-6">Основная информация</h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
