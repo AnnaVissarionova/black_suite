@@ -2,13 +2,15 @@
   <div class="flex justify-between items-center mb-4">
     <h3 class="font-medium text-gray-900">3D визуализация</h3>
     <div class="flex space-x-2">
-      <button onclick="resetCamera()" class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">
+      <button data-action="click->lazy-plot#resetCamera"
+              class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition">
         Сбросить камеру
       </button>
-      <button onclick="downloadPlot()" class="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded hover:bg-primary-200 transition">
+      <button data-action="click->lazy-plot#downloadPlot"
+              class="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded hover:bg-primary-200 transition">
         Скачать график
       </button>
     </div>
   </div>
-  <div id="optimization-plot" class="plotly-plot"></div>
+  <div data-lazy-plot-target="optimizationPlot" class="plotly-plot"></div>
 </div>

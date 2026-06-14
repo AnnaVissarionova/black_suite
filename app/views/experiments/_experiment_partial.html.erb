@@ -24,6 +24,7 @@
 
           <% if @json_results_count && @json_results_count > 0 %>
             <%= link_to download_json_project_experiment_path(@project, @experiment),
+                        data: { turbo: false },
                         class: "inline-flex items-center px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-300 transition-all" do %>
               <svg class="h-3.5 w-3.5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -49,6 +50,12 @@
     <% elsif @latest_json&.valid_json? && @stats.present? && @plot_3d_data.present? %>
       <%= render 'experiments/stats_panel', stats: @stats, json_result: @latest_json %>
 
+
+      <div data-controller="lazy-plot"
+           data-lazy-plot-plot3d-value="<%= @plot_3d_data.to_json %>"
+           data-lazy-plot-fitness-history-value="<%= @fitness_history_data.to_json %>"
+           data-lazy-plot-experiment-id-value="<%= @experiment.id %>"
+           data-lazy-plot-project-id-value="<%= @project.id %>">
       <% if @stats[:dimension] && @stats[:dimension] > 2 %>
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-4">
           <h3 class="font-medium text-gray-700 mb-3 text-sm">Выбор параметров для визуализации</h3>
@@ -56,7 +63,8 @@
             <div>
               <label class="block text-xs font-medium text-gray-600 mb-1">Параметр X:</label>
               <select id="param-x-select"
-                      onchange="reloadExperimentWithParams()"
+                      data-action="change->lazy-plot#updateParams"
+                      data-lazy-plot-target="paramX"
                       class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary-400 focus:ring-primary-400 text-sm">
                 <% @stats[:variables].each_with_index do |var, index| %>
                   <option value="<%= index %>" <%= 'selected' if index == (params[:param_x]&.to_i || 0) %>><%= var %></option>
@@ -66,7 +74,8 @@
             <div>
               <label class="block text-xs font-medium text-gray-600 mb-1">Параметр Y:</label>
               <select id="param-y-select"
-                      onchange="reloadExperimentWithParams()"
+                      data-action="change->lazy-plot#updateParams"
+                      data-lazy-plot-target="paramY"
                       class="w-full rounded-lg border-gray-200 shadow-sm focus:border-primary-400 focus:ring-primary-400 text-sm">
                 <% @stats[:variables].each_with_index do |var, index| %>
                   <option value="<%= index %>" <%= 'selected' if index == (params[:param_y]&.to_i || 1) %>><%= var %></option>
@@ -77,11 +86,6 @@
         </div>
       <% end %>
 
-      <div data-controller="lazy-plot"
-           data-lazy-plot-plot3d-value="<%= @plot_3d_data.to_json %>"
-           data-lazy-plot-fitness-history-value="<%= @fitness_history_data.to_json %>"
-           data-lazy-plot-experiment-id-value="<%= @experiment.id %>"
-           data-lazy-plot-project-id-value="<%= @project.id %>">
 
         <%= render 'experiments/plot_3d' %>
         <%= render 'experiments/fitness_history_plot' %>
@@ -137,17 +141,3 @@
         border: 1px solid #e5e7eb;
     }
 </style>
-
-<script>
-    function resetCamera() {
-        if (typeof Plotly !== 'undefined') {
-            Plotly.relayout('optimization-plot', { 'scene.camera.eye': { x: 1.5, y: 1.5, z: 1.5 } });
-        }
-    }
-
-    function downloadPlot() {
-        if (typeof Plotly !== 'undefined') {
-            Plotly.downloadImage(document.getElementById('optimization-plot'), { format: 'png', filename: 'optimization_plot' });
-        }
-    }
-</script>

@@ -6,22 +6,15 @@
   </div>
 
   <div class="flex justify-between items-start mt-2 mb-4">
-    <div class="flex-1">
+    <div class="flex-1 min-w-0">
       <%= link_to project, class: "block no-underline group" do %>
-        <h3 class="text-lg font-semibold text-gray-800 mb-2 group-hover:text-primary-600 transition">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2 group-hover:text-primary-600 transition truncate">
           <%= project.name %>
         </h3>
-        <div class="min-h-[40px]">
-          <% if project.description.present? %>
-            <p class="text-gray-500 text-sm mb-3 truncate line-clamp-2"><%= project.description %></p>
-          <% else %>
-            <p class="text-gray-300 text-sm italic mb-3">Нет описания</p>
-          <% end %>
-        </div>
       <% end %>
     </div>
 
-    <div class="flex items-center space-x-1">
+    <div class="flex items-center space-x-1 flex-shrink-0 ml-2">
       <%= link_to edit_project_path(project),
                   class: "text-gray-300 hover:text-primary-500 p-1.5 rounded-lg hover:bg-gray-50 transition" do %>
         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,6 +35,19 @@
         </svg>
       <% end %>
     </div>
+  </div>
+
+  <div class="flex-1 min-h-0 mb-3">
+    <% if project.description.present? %>
+      <div class="relative">
+        <p class="text-gray-500 text-sm overflow-hidden text-ellipsis"
+           style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; word-break: break-word;">
+          <%= project.description %>
+        </p>
+      </div>
+    <% else %>
+      <p class="text-gray-300 text-sm italic">Нет описания</p>
+    <% end %>
   </div>
 
   <div class="flex justify-between items-center text-xs text-gray-400 pt-3 border-t border-gray-50 mt-auto">

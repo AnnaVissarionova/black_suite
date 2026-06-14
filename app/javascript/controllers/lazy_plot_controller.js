@@ -1,6 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
+    static targets = ["paramX", "paramY", "optimizationPlot"]
   static values = {
     plot3d: Object,
     fitnessHistory: Object,
@@ -9,116 +10,139 @@ export default class extends Controller {
   }
 
   connect() {
-    this.renderPlots()
-  }
+        this.originalPlotData = JSON.parse(JSON.stringify(this.plot3dValue))
+        this.originalFitnessData = JSON.parse(JSON.stringify(this.fitnessHistoryValue))
+        this.renderPlots()
+    }
 
   renderPlots() {
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(() => this.draw3dPlot(), { timeout: 1000 })
-      requestIdleCallback(() => this.drawFitnessHistoryPlot(), { timeout: 2000 })
-    } else {
-      setTimeout(() => this.draw3dPlot(), 100)
-      setTimeout(() => this.drawFitnessHistoryPlot(), 200)
-    }
+      if (window.Plotly) {
+          this.draw3dPlot()
+          this.drawFitnessHistoryPlot()
+      } else {
+          const checkPlotly = setInterval(() => {
+              if (window.Plotly) {
+                  clearInterval(checkPlotly)
+                  this.draw3dPlot()
+                  this.drawFitnessHistoryPlot()
+              }
+          }, 100)
+      }
   }
 
   draw3dPlot() {
-    const data = this.plot3dValue
-    if (!data?.points?.length) {
-      const plotElement = document.getElementById('optimization-plot')
-      if (plotElement) {
-        plotElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">Нет данных для отображения</div>'
+      const data = this.plot3dValue
+      const plotElement = this.optimizationPlotTarget
+
+      if (!plotElement || !data?.points?.length) {
+          if (plotElement) {
+              plotElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">Нет данных для отображения</div>'
+          }
+          return
       }
-      return
-    }
 
-    const plotElement = document.getElementById('optimization-plot')
-    if (!plotElement) return
+      if (window.Plotly) {
+          Plotly.purge(plotElement)
+      }
 
-    if (plotElement.data && Plotly) {
-      Plotly.purge(plotElement)
-    }
+      const trace = {
+          x: data.points.map(p => p.x),
+          y: data.points.map(p => p.y),
+          z: data.points.map(p => p.z),
+          mode: 'markers',
+          type: 'scatter3d',
+          marker: {
+              size: 5,
+              color: data.points.map(p => p.z),
+              colorscale: 'Viridis',
+              colorbar: { title: 'fitness' },
+              opacity: 0.8
+          },
+          text: data.points.map(p =>
+              `${data.selected_x_name}: ${p.x?.toFixed(4)}<br>` +
+              `${data.selected_y_name}: ${p.y?.toFixed(4)}<br>` +
+              `Fitness: ${p.z?.toFixed(4)}`
+          ),
+          hovertemplate: '%{text}<extra></extra>'
+      }
 
-    const trace = {
-      x: data.points.map(p => p.x),
-      y: data.points.map(p => p.y),
-      z: data.points.map(p => p.z),
-      mode: 'markers',
-      type: 'scatter3d',
-      marker: {
-        size: 5,
-        color: data.points.map(p => p.z),
-        colorscale: 'Viridis',
-        colorbar: { title: 'fitness' },
-        opacity: 0.8
-      },
-      text: data.points.map(p =>
-          `${data.selected_x_name}: ${p.x.toFixed(4)}<br>` +
-          `${data.selected_y_name}: ${p.y.toFixed(4)}<br>` +
-          `Fitness: ${p.z.toFixed(4)}`
-      ),
-      hovertemplate: '%{text}<extra></extra>'
-    }
+      const layout = {
+          scene: {
+              xaxis: {
+                  title: { text: data.selected_x_name },
+                  gridcolor: '#e5e7eb',
+                  showbackground: true,
+                  backgroundcolor: '#f9fafb'
+              },
+              yaxis: {
+                  title: { text: data.selected_y_name },
+                  gridcolor: '#e5e7eb',
+                  showbackground: true,
+                  backgroundcolor: '#f9fafb'
+              },
+              zaxis: {
+                  title: { text: 'fitness' },
+                  gridcolor: '#e5e7eb',
+                  showbackground: true,
+                  backgroundcolor: '#f9fafb'
+              },
+              camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
+          },
+          margin: { l: 0, r: 0, b: 0, t: 50 }
+      }
 
-    const layout = {
-      scene: {
-        xaxis: { title: { text: data.selected_x_name }, gridcolor: '#e5e7eb', showbackground: true, backgroundcolor: '#f9fafb' },
-        yaxis: { title: { text: data.selected_y_name }, gridcolor: '#e5e7eb', showbackground: true, backgroundcolor: '#f9fafb' },
-        zaxis: { title: { text: 'fitness' }, gridcolor: '#e5e7eb', showbackground: true, backgroundcolor: '#f9fafb' },
-        camera: { eye: { x: 1.5, y: 1.5, z: 1.5 } }
-      },
-      margin: { l: 0, r: 0, b: 0, t: 50 }
-    }
+      const config = {
+          responsive: true,
+          displaylogo: false
+      }
 
-    Plotly.newPlot(plotElement, [trace], layout, {
-      responsive: true,
-      displaylogo: false
-    })
+      window.Plotly.newPlot(plotElement, [trace], layout, config)
   }
 
   drawFitnessHistoryPlot() {
-    const data = this.fitnessHistoryValue
-    if (!data?.history?.length) {
+      const data = this.fitnessHistoryValue
       const plotElement = document.getElementById('fitness-history-plot')
-      if (plotElement) {
-        plotElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">Нет данных истории</div>'
+
+      if (!plotElement || !data?.history?.length) {
+          if (plotElement) {
+              plotElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400">Нет данных истории</div>'
+          }
+          return
       }
-      return
-    }
 
-    const plotElement = document.getElementById('fitness-history-plot')
-    if (!plotElement) return
+      // Очищаем предыдущий график
+      if (window.Plotly) {
+          Plotly.purge(plotElement)
+      }
 
-    if (plotElement.data && Plotly) {
-      Plotly.purge(plotElement)
-    }
+      const trace = {
+          x: data.iterations,
+          y: data.history,
+          mode: 'lines+markers',
+          type: 'scatter',
+          line: { color: 'rgb(16, 185, 129)', width: 2 },
+          marker: { size: 4, color: 'rgb(16, 185, 129)' },
+          text: data.history.map((fitness, i) =>
+              `Итерация: ${data.iterations[i]}<br>Лучшее значение: ${fitness?.toFixed(4)}`
+          ),
+          hovertemplate: '%{text}<extra></extra>'
+      }
 
-    const trace = {
-      x: data.iterations,
-      y: data.history,
-      mode: 'lines+markers',
-      type: 'scatter',
-      line: { color: 'rgb(16, 185, 129)', width: 2 },
-      marker: { size: 4, color: 'rgb(16, 185, 129)' },
-      text: data.history.map((fitness, i) =>
-          `Итерация: ${data.iterations[i]}<br>Лучшее значение: ${fitness.toFixed(4)}`
-      ),
-      hovertemplate: '%{text}<extra></extra>'
-    }
+      const layout = {
+          title: { text: 'История сходимости', font: { size: 16 } },
+          xaxis: { title: 'Номер итерации', gridcolor: '#e5e7eb' },
+          yaxis: { title: 'Лучшее значение', gridcolor: '#e5e7eb' },
+          margin: { l: 70, r: 20, b: 70, t: 50 },
+          plot_bgcolor: 'white',
+          paper_bgcolor: 'white'
+      }
 
-    const layout = {
-      title: { text: 'История сходимости', font: { size: 16 } },
-      xaxis: { title: 'Номер итерации', gridcolor: '#e5e7eb' },
-      yaxis: { title: 'Лучшее значение', gridcolor: '#e5e7eb' },
-      margin: { l: 70, r: 20, b: 70, t: 50 },
-      plot_bgcolor: 'white',
-      paper_bgcolor: 'white'
-    }
+      const config = {
+          responsive: true,
+          displaylogo: false
+      }
 
-    Plotly.newPlot(plotElement, [trace], layout, {
-      responsive: true,
-      displaylogo: false
-    })
+      window.Plotly.newPlot(plotElement, [trace], layout, config)
   }
 
   resetCamera() {
@@ -135,41 +159,48 @@ export default class extends Controller {
     }
   }
 
-  async updateParams() {
-    const paramXSelect = document.getElementById('param-x-select')
-    const paramYSelect = document.getElementById('param-y-select')
+    updateParams() {
+        const paramX = this.hasParamXTarget ? parseInt(this.paramXTarget.value) : 0
+        const paramY = this.hasParamYTarget ? parseInt(this.paramYTarget.value) : 1
 
-    if (!paramXSelect || !paramYSelect) return
+        // Перестраиваем данные для новых параметров БЕЗ ЗАПРОСА К БЕКЕНДУ
+        const updatedPlotData = this.rebuildPlotData(paramX, paramY)
 
-    const paramX = paramXSelect.value
-    const paramY = paramYSelect.value
+        // Обновляем значения
+        this.plot3dValue = updatedPlotData
+        this.fitnessHistoryValue = this.originalFitnessData // История fitness не меняется
 
-    this.showLoading()
-    this.showLoading()
-
-    try {
-      const response = await fetch(`/projects/${this.projectIdValue}/experiments/${this.experimentIdValue}/update_plot_data?param_x=${paramX}&param_y=${paramY}`, {
-        headers: {
-          'Accept': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-        }
-      })
-
-      if (!response.ok) throw new Error('Failed to fetch data')
-
-      const data = await response.json()
-
-      this.plot3dValue = data.plot_3d
-      this.fitnessHistoryValue = data.fitness_history
-
-      this.draw3dPlot()
-      this.drawFitnessHistoryPlot()
-
-    } catch (error) {
-      console.error('Error updating plots:', error)
-      this.hideLoading()
+        // Перерисовываем графики
+        this.draw3dPlot()
+        this.drawFitnessHistoryPlot()
     }
-  }
+
+
+    rebuildPlotData(selectedXIndex, selectedYIndex) {
+        if (!this.originalPlotData || !this.originalPlotData.points) {
+            return this.originalPlotData
+        }
+
+        const originalPoints = this.originalPlotData.points
+        const variableNames = this.originalPlotData.variable_names || []
+
+        // Перестраиваем точки с новыми x и y координатами
+        const newPoints = originalPoints.map(point => ({
+            x: point.values[selectedXIndex],
+            y: point.values[selectedYIndex],
+            z: point.fitness,
+            values: point.values,
+            fitness: point.fitness
+        }))
+
+        return {
+            points: newPoints,
+            variable_names: variableNames,
+            selected_x_name: variableNames[selectedXIndex] || `Param ${selectedXIndex}`,
+            selected_y_name: variableNames[selectedYIndex] || `Param ${selectedYIndex}`,
+            dimension: this.originalPlotData.dimension || variableNames.length
+        }
+    }
 
   showLoading() {
     const plotsContainer = this.element

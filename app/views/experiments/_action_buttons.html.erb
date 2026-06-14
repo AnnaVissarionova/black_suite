@@ -12,6 +12,7 @@
 
   <% if json_results_count && json_results_count > 0 %>
     <%= link_to download_json_project_experiment_path(project, experiment),
+                data: { turbo: false },
                 class: "inline-flex items-center justify-center px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:border-primary-300 transition-all shadow-sm",
                 title: "Скачать результаты JSON" do %>
       <svg class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
