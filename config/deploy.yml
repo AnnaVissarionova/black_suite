@@ -56,7 +56,9 @@ accessories:
     image: redis:latest
     host: 2.56.178.138
     port: 6379
-    cmd: "redis-server --requirepass <%= ENV['REDIS_PASSWORD'] %>"
+    files:
+      - config/redis.conf:/usr/local/etc/redis/redis.conf
+    cmd: "redis-server /usr/local/etc/redis/redis.conf"
     directories:
       - redis_data:/data
     options:

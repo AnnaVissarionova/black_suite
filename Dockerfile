@@ -21,6 +21,8 @@ RUN bundle install
 # Копируем остальное приложение
 COPY . .
 
+RUN SECRET_KEY_BASE=placeholder RAILS_ENV=production bundle exec rails assets:precompile
+
 # Порт
 EXPOSE 3000
 

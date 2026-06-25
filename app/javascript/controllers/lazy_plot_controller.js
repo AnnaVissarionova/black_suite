@@ -55,7 +55,7 @@ export default class extends Controller {
               size: 5,
               color: data.points.map(p => p.z),
               colorscale: 'Viridis',
-              colorbar: { title: 'fitness' },
+              colorbar: { title: 'сходимость' },
               opacity: 0.8
           },
           text: data.points.map(p =>

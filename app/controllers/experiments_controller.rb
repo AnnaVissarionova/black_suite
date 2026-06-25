@@ -191,7 +191,7 @@ class ExperimentsController < ApplicationController
   end
 
   def experiment_params
-    params.require(:experiment).permit(:name, :description, :json_file)
+    params.require(:experiment).permit(:name, :description)
   end
 
   def apply_filters(scope)
