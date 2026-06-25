@@ -1,43 +1,3 @@
-#service: black_suite
-#image: anechka5/black_suite
-
-#registry:
-#   server: docker.io
-#   username: anechka5
-#   password:
-#     - KAMAL_REGISTRY_PASSWORD
-
-#builder:
-#  arch:
-#    - amd64
-
-#servers:
-#  web:
-#    hosts:
-#      - acelan.ru
-
-#accessories:
-#  db:
-#    image: postgres:15
-#    host: acelan.ru
-#    port: 5433
-#    env:
-#      clear:
-#        POSTGRES_DB: black_suite_production
-#        POSTGRES_USER: black_suite
-#        POSTGRES_PASSWORD: POSTGRES_PASSWORD
-#    directories:
-#      - postgres_data:/var/lib/postgresql/data
-#    options:
-#      cpus: 0.5
-#      memory: 512M
-
-#env:
-#  clear:
-#    RAILS_ENV: production
-#  secret:
-#    - RAILS_MASTER_KEY
-
 service: black_suite
 image: anechka5/black_suite
 
@@ -56,18 +16,25 @@ builder:
 servers:
   web:
     hosts:
-      - acelan.ru
+      - 2.56.178.138
     env:
       RAILS_SERVE_STATIC_FILES: true
     proxy:
-      ssl: true
+      ssl: false
       app_port: 3000
-      host: acelan.ru
+      host: 2.56.178.138
+
+sidekiq:
+  hosts:
+    - 2.56.178.138
+  cmd: bundle exec sidekiq
+  env:
+    RAILS_SERVE_STATIC_FILES: true
 
 accessories:
   db:
     image: postgres:16
-    host: acelan.ru
+    host: 2.56.178.138
     port: 5433
     env:
       clear:
@@ -81,6 +48,16 @@ accessories:
       cpus: 0.5
       memory: 512M
 
+redis:
+  image: redis:7
+  host: 2.56.178.138
+  port: 6379
+  directories:
+    - redis_data:/data
+  options:
+    cpus: 0.2
+    memory: 256M
+
 env:
   clear:
     RAILS_ENV: production
@@ -88,6 +65,9 @@ env:
     POSTGRES_USER: black_suite
     POSTGRES_HOST: black_suite-db
     POSTGRES_PORT: "5432"
+    REDIS_URL: redis://black_suite-redis:6379/0
+    ACTION_CABLE_ALLOWED_ORIGINS: "http://2.56.178.138:3000"
+    ACTION_CABLE_DISABLE_REQUEST_FORGERY_PROTECTION: "true"
   secret:
     - RAILS_MASTER_KEY
     - POSTGRES_PASSWORD

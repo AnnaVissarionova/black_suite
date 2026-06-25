@@ -3,6 +3,17 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Настройка Action Cable
+  # config.action_cable.allowed_request_origins = [ 'http://2.56.178.138:3000' ]
+  config.action_cable.allowed_request_origins = [
+      ENV.fetch("ACTION_CABLE_ALLOWED_ORIGINS", "http://localhost:3000")
+    ]
+  config.action_cable.disable_request_forgery_protection = true
+  config.action_cable.mount_path = '/cable'
+
+  # Для production используем async adapter
+  config.action_cable.url = "ws://2.56.178.138:3000/cable"
+
   # Code is not reloaded between requests.
   config.enable_reloading = false
 
@@ -51,7 +62,7 @@ Rails.application.configure do
   config.cache_store = :memory_store
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :async
+  config.active_job.queue_adapter = :sidekiq
   # config.solid_queue.connects_to = { database: { writing: :queue } }
 
   # Ignore bad email addresses and do not raise email delivery errors.
