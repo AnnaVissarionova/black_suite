@@ -24,12 +24,12 @@ servers:
       app_port: 3000
       host: 2.56.178.138
 
-sidekiq:
-  hosts:
-    - 2.56.178.138
-  cmd: bundle exec sidekiq
-  env:
-    RAILS_SERVE_STATIC_FILES: true
+  sidekiq:
+    hosts:
+      - 2.56.178.138
+    cmd: bundle exec sidekiq
+    env:
+      RAILS_SERVE_STATIC_FILES: true
 
 accessories:
   db:
@@ -48,15 +48,15 @@ accessories:
       cpus: 0.5
       memory: 512M
 
-redis:
-  image: redis:7
-  host: 2.56.178.138
-  port: 6379
-  directories:
-    - redis_data:/data
-  options:
-    cpus: 0.2
-    memory: 256M
+  redis:
+    image: redis:7
+    host: 2.56.178.138
+    port: 6379
+    directories:
+      - redis_data:/data
+    options:
+      cpus: 0.2
+      memory: 256M
 
 env:
   clear:
@@ -65,9 +65,11 @@ env:
     POSTGRES_USER: black_suite
     POSTGRES_HOST: black_suite-db
     POSTGRES_PORT: "5432"
-    REDIS_URL: redis://black_suite-redis:6379/0
     ACTION_CABLE_ALLOWED_ORIGINS: "http://2.56.178.138:3000"
     ACTION_CABLE_DISABLE_REQUEST_FORGERY_PROTECTION: "true"
   secret:
     - RAILS_MASTER_KEY
     - POSTGRES_PASSWORD
+    - REDIS_URL
+    - REDIS_PASSWORD
+    - KAMAL_REGISTRY_PASSWORD
