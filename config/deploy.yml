@@ -23,6 +23,8 @@ servers:
       ssl: false
       app_port: 3000
       host: 2.56.178.138
+    options:
+      network: "private"
 
   sidekiq:
     hosts:
@@ -30,6 +32,8 @@ servers:
     cmd: bundle exec sidekiq
     env:
       RAILS_SERVE_STATIC_FILES: true
+    options:
+      network: "private"
 
 accessories:
   db:
@@ -49,14 +53,14 @@ accessories:
       memory: 512M
 
   redis:
-    image: redis:7
+    image: redis:latest
     host: 2.56.178.138
     port: 6379
+    cmd: "redis-server --requirepass <%= ENV['REDIS_PASSWORD'] %>"
     directories:
       - redis_data:/data
     options:
-      cpus: 0.2
-      memory: 256M
+      network: "private"
 
 env:
   clear:
