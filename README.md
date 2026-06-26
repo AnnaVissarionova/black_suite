@@ -26,6 +26,12 @@ Frontend: Tailwind CSS, Stimulus, Turbo
 
 База данных: PostgreSQL
 
+Интеграция с ИИ: ruby-openai + DeepSeek
+
+Аутентификация: Devise + API токены
+
+Развертывание: Kamal + Docker
+
 
 ## Установка и запуск
 ```
@@ -50,7 +56,3 @@ curl -X POST http://localhost:3000/api/add_experiment_result \
   -F "project_id=1" \
   -F "json_file=@result.json" \
   -F "experiment_name=Название эксперимента"
-
-Аутентификация: Devise + API токены
-
-Развертывание: Kamal + Docker
